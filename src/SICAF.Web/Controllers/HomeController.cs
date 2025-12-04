@@ -20,7 +20,7 @@ public class HomeController(
     public IActionResult Index() => View();
 
     [AllowAnonymous]
-    [HttpGet("api/alexander_ardila")]
+    [HttpGet("api/system-status")]
     public async Task<IActionResult> SystemStatusJson()
     {
         try
