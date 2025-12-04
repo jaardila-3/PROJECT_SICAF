@@ -1,0 +1,41 @@
+@model GradeDistributionDetailDto
+
+<div class="card">
+    <div class="card-header bg-primary text-white">
+        <h5 class="card-title mb-0 text-white">
+            <i class="ti ti-chart-bar me-2"></i>Registros de Evaluación
+        </h5>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table id="detailTable"
+                class="datatablesAdvancedJQuery table table-striped table-bordered text-nowrap align-middle">
+                <thead>
+                    <tr>
+                        <th class="text-center">No.</th>
+                        <th>Estudiante</th>
+                        <th>Tarea</th>
+                        <th>Misión/Fase</th>
+                        <th class="text-center">Aeronave</th>
+                        <th class="text-center">Fecha</th>
+                        <th>Instructor</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var record in Model.Records)
+                    {
+                        <tr>
+                            <td class="text-center">@record.Number</td>
+                            <td>@record.StudentName</td>
+                            <td>@record.TaskName</td>
+                            <td>@record.MissionPhaseName</td>
+                            <td class="text-center">@record.AircraftRegistration</td>
+                            <td class="text-center">@record.EvaluationDate.ToString("dd/MM/yyyy")</td>
+                            <td>@record.InstructorName</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

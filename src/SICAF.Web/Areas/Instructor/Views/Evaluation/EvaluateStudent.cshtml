@@ -1,0 +1,368 @@
+@model EvaluationOverviewDto
+@{
+    ViewData["Title"] = "Evaluar Estudiante";
+
+    string pendingCommittee = UserConstants.StudentStatus.PendingCommittee;
+    string suspended = UserConstants.StudentStatus.Suspended;
+    string courseCompleted = UserConstants.StudentStatus.CourseCompleted;
+    string active = UserConstants.StudentStatus.Active;
+}
+
+<nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb rounded">
+        <li class="breadcrumb-item">
+            <a href="@Url.Action("Index", "Home", new { area = "" })" class="text-success d-flex align-items-center">
+                <i class="ti ti-home fs-4 mt-1"></i>
+            </a>
+        </li>
+        <li class="breadcrumb-item">
+            <a href="@Url.Action("Index", "Course", new { area = "Academic" })" class="text-success">Programas</a>
+        </li>
+        <li class="breadcrumb-item">
+            <a href="@Url.Action("Details", "Course", new { area = "Academic", id = Model.CourseId })"
+                class="text-success">Detalles</a>
+        </li>
+        <li class="breadcrumb-item text-success active" aria-current="page">Evaluar</li>
+    </ol>
+</nav>
+
+<div class="container-fluid">
+    <!-- Información del Estudiante -->
+    <partial name="_StudentInfoCard" model="Model" />
+
+    <!-- ALERTAS DE ESTADO -->
+    <partial name="_StatusAlerts" model="Model" />
+
+    <!-- Misiones Completadas (Accordion) -->
+    @if (Model.CompletedMissions.Any())
+    {
+        <partial name="_CompletedMissions" model="Model" />
+    }
+
+    <!-- Comités de la Fase Actual (Accordion) -->
+    @if (Model.CommitteeRecordsInCurrentPhase.Any())
+    {
+        <partial name="_CommitteeRecords" model="Model" />
+    }
+
+    <!-- SECCIÓN PRINCIPAL: EVALUACIÓN O ACCIONES -->
+    @if (Model.NextMissionToEvaluate != null)
+    {
+        <!-- HAY MISIÓN PARA EVALUAR -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card mission-card">
+                    <div class="card-header">
+                        <div class="row align-items-center">
+                            <div class="col">
+                                <h5 class="card-title mb-0">
+                                    <i class="ti ti-clipboard-check me-2 text-primary"></i>
+                                    Misión/Periodo @Model.NextMissionToEvaluate.MissionNumber
+                                </h5>
+                                <small class="text-muted">
+                                    Horas de vuelo: @Model.NextMissionToEvaluate.FlightHours.ToString("F1") |
+                                    Tipo: @Model.NextMissionToEvaluate.WingType
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        @if (Model.Status == active)
+                        {
+                            <!-- FORMULARIO HABILITADO -->
+                            <partial name="_EvaluationForm" model="Model" />
+                        }
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        if (Model.Status == pendingCommittee)
+        {
+            <!-- FORMULARIO DESHABILITADO -->
+            <fieldset disabled>
+                <div class="alert alert-info mb-3">
+                    <i class="ti ti-info-circle me-2"></i>
+                    El formulario de evaluación está deshabilitado mientras se espera la decisión del comité.
+                </div>
+            </fieldset>
+
+            @if (ViewBag.IsFlightLeader == true)
+            {
+                <div class="text-center my-3">
+                    <button type="button" class="btn btn-outline-info btn-lg" data-bs-toggle="modal"
+                        data-bs-target="#modalCommitteeDecision">
+                        <i class="ti ti-gavel me-2"></i>
+                        Registrar Decisión del Comité
+                    </button>
+                </div>
+
+                <!-- MODAL: DECISIÓN DE COMITÉ -->
+                <partial name="_ModalCommittee" model="Model" />
+            }
+            else
+            {
+                <div class="alert alert-info text-center mt-3">
+                    <p class="mb-0">
+                        Solo el <strong>Líder de Vuelo</strong> puede registrar la decisión del comité.
+                    </p>
+                </div>
+            }
+        }
+        else if (Model.Status == suspended)
+        {
+            <!-- MENSAJE DE Programa TERMINADO -->
+            <div class="alert alert-danger text-center">
+                <i class="ti ti-ban fs-1"></i>
+                <h5 class="mt-3">No se puede evaluar</h5>
+                <p>El estudiante ha sido suspendido definitivamente y no puede continuar en el programa.</p>
+            </div>
+
+            <div class="text-center my-3">
+                <a href="@Url.Action("Details", "Course", new { area = "Academic", id = Model.CourseId })"
+                    class="btn btn-outline-secondary">
+                    <i class="ti ti-arrow-left me-1"></i>
+                    Volver al Programa
+                </a>
+            </div>
+        }
+        else if (Model.Status == courseCompleted)
+        {
+            <div class="row">
+                <div class="col-12">
+                    <div class="card border-success shadow-lg">
+                        <div class="card-header bg-success text-white">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <h4 class="card-title mb-0">
+                                    <i class="ti ti-trophy me-2"></i>
+                                    Programa Completado
+                                </h4>
+                                <span class="badge bg-white text-success fs-5">
+                                    <i class="ti ti-check-circle me-1"></i>
+                                    Aprobado
+                                </span>
+                            </div>
+                        </div>
+                        <div class="card-body text-center py-5">
+                            <i class="ti ti-trophy text-success mb-4" style="font-size: 5rem;"></i>
+
+                            <h3 class="mb-3 text-success">
+                                ¡Felicitaciones!
+                            </h3>
+
+                            <h5 class="mb-4 text-muted">
+                                El estudiante <strong>@Model.StudentFullName</strong> ha completado
+                                exitosamente todas las fases del programa.
+                            </h5>
+
+                            <div class="alert alert-info d-inline-block">
+                                <i class="ti ti-info-circle me-2"></i>
+                                No se pueden realizar más evaluaciones para este estudiante en este programa.
+                            </div>
+
+                            <div class="mt-4">
+                                <a href="@Url.Action("Details", "Course", new { area = "Academic", id = Model.CourseId })"
+                                    class="btn btn-outline-secondary btn-lg me-2">
+                                    <i class="ti ti-arrow-left me-1"></i>
+                                    Volver al Programa
+                                </a>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+        else
+        {
+            <!-- FASE COMPLETADA - SIN MISIÓN PENDIENTE -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="card border-success shadow-sm">
+                        <div class="card-header bg-success text-white">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <h5 class="card-title mb-0">
+                                    <i class="ti ti-trophy me-2"></i>
+                                    Fase Completada - @Model.CurrentPhase.Name
+                                </h5>
+                                <span class="badge bg-white text-success">
+                                    @Model.CompletedMissionsCount/@Model.TotalMissionsInPhase Misiones
+                                </span>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="alert alert-success text-center mb-4">
+                                <i class="ti ti-check-circle me-2 fs-2"></i>
+                                <h6 class="mb-2">¡Todas las misiones han sido completadas!</h6>
+                                <p class="mb-0 text-muted">
+                                    El estudiante <strong>@Model.StudentFullName</strong> ha completado
+                                    las @Model.TotalMissionsInPhase misiones de la fase.
+                                </p>
+                            </div>
+
+                            @if (ViewBag.IsFlightLeader == true)
+                            {
+                                @if (Model.Status == active)
+                                {
+                                    if (Model.IsLastPhase)
+                                    {
+                                        <!-- Última Fase: Finalizar y Aprobar Programa -->
+                                        <div class="card border-success">
+                                            <div class="card-body text-center">
+                                                <i class="ti ti-trophy text-success" style="font-size: 3rem;"></i>
+                                                <h5 class="mt-3 mb-2">¡Programa Completado Exitosamente!</h5>
+                                                <p class="text-muted mb-3">
+                                                    El estudiante ha completado todas las fases del programa.
+                                                </p>
+                                                <button type="button" id="btnFinalizeAndApproveCourse" class="btn btn-success btn-lg"
+                                                    data-student-id="@Model.StudentId" data-course-id="@Model.CourseId"
+                                                    data-phase-id="@Model.CurrentPhase.Id" data-leader-id="@Model.InstructorId"
+                                                    data-student-name="@Model.StudentFullName">
+                                                    <i class="ti ti-trophy me-2"></i>
+                                                    Finalizar y Aprobar Programa
+                                                </button>
+                                            </div>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <!-- No es última fase: Promover a Siguiente Fase -->
+                                        <div class="card border-primary">
+                                            <div class="card-body text-center">
+                                                <i class="ti ti-arrow-up-circle text-primary" style="font-size: 3rem;"></i>
+                                                <h5 class="mt-3 mb-2">Promover a Siguiente Fase</h5>
+                                                <p class="text-muted mb-3">
+                                                    El estudiante avanzará a la siguiente fase del programa
+                                                    y podrá continuar con su entrenamiento.
+                                                </p>
+                                                <button type="button" id="btnPromotePhase" class="btn btn-primary btn-lg"
+                                                    data-student-id="@Model.StudentId" data-course-id="@Model.CourseId"
+                                                    data-phase-id="@Model.CurrentPhase.Id" data-leader-id="@Model.InstructorId"
+                                                    data-student-name="@Model.StudentFullName" data-phase-name="@Model.CurrentPhase.Name">
+                                                    <i class="ti ti-arrow-up me-2"></i>
+                                                    Promover a Siguiente Fase
+                                                </button>
+                                            </div>
+                                        </div>
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                <!-- No es Líder de Vuelo -->
+                                <div class="alert alert-warning text-center">
+                                    <i class="ti ti-clock me-2"></i>
+                                    <strong>Pendiente de Decisión del Comité</strong>
+                                    <p class="mb-0 mt-2">
+                                        El estudiante ha completado todas las misiones y está esperando la
+                                        decisión del <strong>Comité</strong> para continuar.
+                                    </p>
+                                </div>
+                            }
+
+                            <hr class="my-4">
+                            <div class="text-center">
+                                <a href="@Url.Action("Details", "Course", new { area = "Academic", id = Model.CourseId })"
+                                    class="btn btn-outline-secondary">
+                                    <i class="ti ti-arrow-left me-1"></i>
+                                    Volver a los Detalles
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+</div>
+
+@section Styles {
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-material-datetimepicker/2.7.1/css/bootstrap-material-datetimepicker.min.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="~/css/Areas/Instructor/Evaluation/evaluate-student.css">
+}
+
+@section Scripts {
+    <script src="~/assets/js/extra-libs/moment/moment.min.js"></script>
+    <script
+        src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-material-datetimepicker/2.7.1/js/bootstrap-material-datetimepicker.min.js"></script>
+    <script src="~/assets/js/plugins/bootstrap-validation-init.js"></script>
+    <script type="module" src="~/js/Areas/Instructor/Evaluation/evaluate-student.js"></script>
+
+    <script type="text/javascript">
+        // Inicializar DatePicker para fecha de evaluación
+        $("#EvaluationDate").bootstrapMaterialDatePicker({
+            weekStart: 0,
+            time: false,
+            format: 'DD/MM/YYYY',
+            maxDate: new Date(), // No permite fechas futuras
+            lang: 'es'
+        });
+
+        // Contador de caracteres para observaciones
+        const textarea = document.getElementById('GeneralObservations');
+        if (textarea) {
+            const charCount = document.getElementById('charCount');
+            const charRemaining = document.getElementById('charRemaining');
+            const maxChars = 2000;
+
+            function updateCharCount() {
+                const currentLength = textarea.value.length;
+                const remaining = maxChars - currentLength;
+
+                charCount.textContent = currentLength;
+                charRemaining.textContent = `(${remaining} restantes)`;
+
+                // Cambiar color según el porcentaje usado
+                if (remaining < 100) {
+                    charCount.className = 'text-danger fw-bold';
+                    charRemaining.className = 'ms-2 text-danger fw-bold';
+                } else if (remaining < 300) {
+                    charCount.className = 'text-warning fw-bold';
+                    charRemaining.className = 'ms-2 text-warning fw-bold';
+                } else {
+                    charCount.className = 'text-muted';
+                    charRemaining.className = 'ms-2 text-muted';
+                }
+            }
+
+            // Actualizar contador al escribir
+            textarea.addEventListener('input', updateCharCount);
+
+            // Inicializar contador
+            updateCharCount();
+        }
+
+        // Validación del input de horas de vuelo máquina
+        const machineHoursInput = document.getElementById('MachineFlightHours');
+        if (machineHoursInput) {
+            machineHoursInput.addEventListener('input', function () {
+                const value = parseFloat(this.value);
+
+                if (this.value && (isNaN(value) || value < 0.1 || value > 10.0)) {
+                    this.setCustomValidity('Las horas de vuelo máquina deben estar entre 0.1 y 10.0');
+                    this.classList.add('is-invalid');
+                } else {
+                    this.setCustomValidity('');
+                    this.classList.remove('is-invalid');
+                }
+            });
+
+            // Validación al intentar enviar
+            machineHoursInput.addEventListener('invalid', function () {
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Horas de vuelo inválidas',
+                        text: 'Las horas de vuelo máquina deben estar entre 0.1 y 10.0',
+                        confirmButtonText: 'Entendido'
+                    });
+                }
+            });
+        }
+    </script>
+}

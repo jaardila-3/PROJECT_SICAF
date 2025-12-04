@@ -1,0 +1,46 @@
+/* ==================== 
+   DATA TABLES
+   ==================== */
+
+.dataTables_wrapper .dataTables_filter {
+    float: right !important;
+    text-align: right !important;
+}
+
+.dataTables_wrapper .dataTables_length {
+    float: left !important;
+}
+
+.dataTables_wrapper .dataTables_info {
+    float: left !important;
+    padding-top: 0.85em;
+}
+
+.dataTables_wrapper .dataTables_paginate {
+    float: right !important;
+    text-align: right !important;
+}
+
+/* Asegurar que el contenedor tenga el ancho completo */
+.dataTables_wrapper {
+    width: 100%;
+}
+
+/* Estilo para el input de búsqueda */
+.dataTables_filter input {
+    margin-left: 0.5em;
+    display: inline-block;
+    width: auto;
+}
+
+@media (max-width: 767px) {
+
+    .dataTables_wrapper .dataTables_filter,
+    .dataTables_wrapper .dataTables_length,
+    .dataTables_wrapper .dataTables_info,
+    .dataTables_wrapper .dataTables_paginate {
+        float: none !important;
+        text-align: center !important;
+        margin-bottom: 0.5rem;
+    }
+}

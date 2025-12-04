@@ -1,0 +1,84 @@
+﻿<!--Layout de la aplicación-->
+<!DOCTYPE html>
+<html lang="es" dir="ltr" data-bs-theme="light" data-color-theme="PONAL_Green_Theme" data-layout="vertical">
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - SICAF</title>
+    <!-- Favicon icon-->
+    <link rel="shortcut icon" type="image/x-icon" href="~/favicon.ico" />
+    <!-- Core Css -->
+    <link rel="stylesheet" href="~/assets/css/styles.css" />
+    <!-- sweetalert2  -->
+    <link rel="stylesheet" href="~/assets/libs/sweetalert2/dist/sweetalert2.min.css">
+    <!-- Custom Css -->
+    <link rel="stylesheet" href="~/css/police-green-theme.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    @await RenderSectionAsync("Styles", required: false)
+</head>
+
+<body class="link-sidebar">
+    <!-- Preloader -->
+    <div class="preloader">
+        <img src="~/assets/images/logos/preloader.svg" alt="loader" class="lds-ripple img-fluid" />
+    </div>
+    <div id="main-wrapper">
+        @if (User.Identity?.IsAuthenticated ?? false)
+        {
+            <!-- Sidebar -->
+            <partial name="_Sidebar" />
+        }
+
+        <div class="page-wrapper">
+            <!-- Navbar -->
+            <partial name="_Topbar" />
+
+            <!-- Main Content -->
+            <div class="body-wrapper">
+                <div class="container-fluid">
+                    @RenderBody()
+                </div>
+                <!----Footer--->
+                <footer class="footer py-3 bg-white border-top text-center">
+                    2025© SICAF Todos los derechos reservados - Policia Nacional de Colombia
+                </footer>
+            </div>
+        </div>
+    </div>
+    <div class="dark-transparent sidebartoggler"></div>
+
+    <!-- Import Js Files -->
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/assets/libs/simplebar/dist/simplebar.min.js"></script>
+    <script src="~/assets/js/theme/app.init.js"></script>
+    <script src="~/assets/js/theme/theme.js"></script>
+    <script src="~/assets/js/theme/app.min.js"></script>
+    <script src="~/assets/js/theme/sidebarmenu.js"></script>
+
+    <!-- solar icons -->
+    <script src="https://cdn.jsdelivr.net/npm/iconify-icon@1.0.8/dist/iconify-icon.min.js"></script>
+
+    <!-- sweetalert2  -->
+    <script src="~/assets/libs/sweetalert2/dist/sweetalert2.min.js"></script>
+
+    <!-- Custom Js -->
+    <script src="~/js/police-theme.js" asp-append-version="true"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    <!-- Incluir el partial de notificaciones -->
+    <partial name="_NotificationPartial" />
+
+    <script>
+        // Establecer el tema Police Green como predeterminado
+        if (!localStorage.getItem('color-theme')) {
+            localStorage.setItem('color-theme', 'Police_Green_Theme');
+            document.documentElement.setAttribute('data-color-theme', 'Police_Green_Theme');
+        }
+    </script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+
+</html>

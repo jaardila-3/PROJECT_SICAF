@@ -1,0 +1,135 @@
+@model EvaluationOverviewDto
+@{
+    string suspendecourse = UserConstants.CommitteeDecisions.Suspendecourse;
+    string continueCourse = UserConstants.CommitteeDecisions.ContinueCourse;
+}
+
+<div class="modal fade" id="modalCommitteeDecision" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-dark">
+                <h5 class="modal-title">
+                    <i class="ti ti-gavel me-2"></i>
+                    Registrar Decisión del Comité
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="formCommitteeDecision" class="needs-validation" novalidate>
+                <div class="modal-body">
+                    <input type="hidden" id="committeeId" name="CommitteeId" value="@Model.PendingCommittee?.Id" />
+                    <input type="hidden" id="leaderId" name="LeaderId" value="@Model.InstructorId" />
+
+                    <!-- Información del Comité -->
+                    <div class="alert alert-info mb-4">
+                        <h6 class="mb-3"><strong>Información del Comité</strong></h6>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p class="mb-2">
+                                    <strong>Estudiante:</strong><br>
+                                    <span>@Model.StudentFullName</span>
+                                </p>
+                                <p class="mb-2">
+                                    <strong>Fase:</strong><br>
+                                    <span>@Model.CurrentPhase.Name</span>
+                                </p>
+                            </div>
+                            <div class="col-md-6">
+                                <p class="mb-2">
+                                    <strong>Comité Nº:</strong><br>
+                                    <span class="badge bg-danger fs-6">@Model.PendingCommittee?.CommitteeNumber</span>
+                                </p>
+                                <p class="mb-0">
+                                    <strong>Razón:</strong><br>
+                                    <span>@Model.PendingCommittee?.Reason</span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Número de Acta del Comité -->
+                    <div class="mb-3">
+                        <label for="actaNumber" class="form-label fw-bold">
+                            <i class="ti ti-file-text me-1"></i>
+                            Número de Acta del Comité
+                            <span class="text-danger">*</span>
+                        </label>
+                        <input type="text" class="form-control" id="actaNumber" name="ActaNumber" required minlength="5"
+                            maxlength="50" placeholder="Ej: ACTA-COMITE-2025-015">
+                        <small class="text-muted">Ingrese el número de acta generado por el comité</small>
+                        <div class="invalid-feedback">
+                            El número de acta es requerido
+                        </div>
+                    </div>
+
+                    <!-- Decisión del Comité -->
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">
+                            <i class="ti ti-checkbox me-1"></i>
+                            Decisión del Comité
+                            <span class="text-danger">*</span>
+                        </label>
+                        <div class="form-check mb-3 p-3 border rounded">
+                            <input class="form-check-input" type="radio" name="Decision" id="decisionContinuar"
+                                value="@continueCourse" required>
+                            <label class="form-check-label w-100" for="decisionContinuar">
+                                <div class="d-flex align-items-start">
+                                    <i class="ti ti-arrow-forward text-success fs-4 me-2"></i>
+                                    <div>
+                                        <strong class="text-success">Permitir Continuar el Programa</strong>
+                                        <p class="mb-0 small text-muted">
+                                            El estudiante podrá continuar siendo evaluado en la siguiente misión o fase.
+                                        </p>
+                                    </div>
+                                </div>
+                            </label>
+                        </div>
+                        <div class="form-check p-3 border rounded">
+                            <input class="form-check-input" type="radio" name="Decision" id="decisionTerminar"
+                                value="@suspendecourse" required>
+                            <label class="form-check-label w-100" for="decisionTerminar">
+                                <div class="d-flex align-items-start">
+                                    <i class="ti ti-x text-danger fs-4 me-2"></i>
+                                    <div>
+                                        <strong class="text-danger">Suspender el Programa Definitivamente</strong>
+                                        <p class="mb-0 small text-muted">
+                                            El estudiante será dado de baja del programa y no podrá continuar.
+                                        </p>
+                                    </div>
+                                </div>
+                            </label>
+                        </div>
+                        <div class="invalid-feedback d-block" id="decisionError" style="display: none !important;">
+                            Debe seleccionar una decisión del comité
+                        </div>
+                    </div>
+
+                    <!-- Observaciones de la Decisión -->
+                    <div class="mb-3">
+                        <label for="decisionObservations" class="form-label fw-bold">
+                            <i class="ti ti-message-2 me-1"></i>
+                            Observaciones de la Decisión
+                            <span class="text-danger">*</span>
+                        </label>
+                        <textarea class="form-control" id="decisionObservations" name="DecisionObservations" rows="5"
+                            required minlength="20" maxlength="2000"
+                            placeholder="Describa las razones de la decisión del comité, aspectos evaluados, recomendaciones, compromisos del estudiante, etc."></textarea>
+                        <small class="text-muted">Mínimo 20 caracteres, máximo 2000</small>
+                        <div class="invalid-feedback">
+                            Las observaciones son requeridas
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="ti ti-x me-1"></i>
+                        Cancelar
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="ti ti-check me-1"></i>
+                        Registrar Decisión
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

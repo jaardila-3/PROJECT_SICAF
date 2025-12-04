@@ -1,0 +1,50 @@
+﻿@model ErrorViewModel
+@{
+    ViewData["Title"] = "Error";
+}
+
+<h1 class="text-danger">Error</h1>
+<h2 class="text-danger">Ha ocurrido un error en la aplicación.</h2>
+
+@if (Model.StatusCode.HasValue)
+{
+    <p>
+        <strong>Código de estado:</strong> @Model.StatusCode.Value
+    </p>
+}
+
+@if (!string.IsNullOrEmpty(Model.Message))
+{
+    <p>
+        <strong>Mensaje de error:</strong> @Model.Message
+    </p>
+}
+
+@if (Model.ShowRequestId)
+{
+    <p>
+        <strong>ID de solicitud:</strong> <code>@Model.RequestId</code>
+    </p>
+}
+
+<!-- Show Imagen -->
+<div class="mt-4">
+    @if (Model.StatusCode.HasValue)
+    {
+        <img src="@GetErrorImage(Model.StatusCode.Value)" alt="Imagen de error" class="img-fluid"
+            style="max-width: 600px;" />
+    }
+</div>
+
+@functions {
+    private string GetErrorImage(int ErrorStatusCode)
+    {
+        return ErrorStatusCode switch
+        {
+            400 => "/img/error/bad-request.svg", // Imagen para 400 Bad Request
+            404 => "/img/error/not-found.svg", // Imagen para 404 Not Found
+            500 => "/img/error/server-error.svg", // Imagen para 500 Internal Server Error
+            _ => "/img/error/default-error.svg" // Imagen por defecto
+        };
+    }
+}

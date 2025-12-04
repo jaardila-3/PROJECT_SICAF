@@ -1,0 +1,92 @@
+@model UserDto?
+
+<li class="nav-item dropdown">
+    <a class="nav-link pe-0" href="javascript:void(0)" id="drop1" aria-expanded="false">
+        <div class="d-flex align-items-center">
+            @if (Model?.PhotoData != null && Model.PhotoData.Length > 0)
+            {
+                <img src="@Model.PhotoBase64" width="35" height="35" alt="@Model.FullName" style="object-fit: cover;"
+                    class="rounded-circle" />
+            }
+            else if (Model != null)
+            {
+                <div class="rounded-circle bg-success d-flex align-items-center justify-content-center"
+                    style="width: 35px; height: 35px;">
+                    <span class="text-white fw-bold" style="font-size: 12px;">
+                        @Model.Name.Substring(0, 1)@Model.LastName.Substring(0, 1)
+                    </span>
+                </div>
+            }
+            else
+            {
+                <img src="~/assets/images/profile/user-1.png" class="rounded-circle" width="35" height="35" alt="Usuario" />
+            }
+        </div>
+    </a>
+
+    <div class="dropdown-menu content-dd dropdown-menu-end dropdown-menu-animate-up" aria-labelledby="drop1">
+        <div class="profile-dropdown position-relative" data-simplebar>
+            <div class="py-3 px-7 pb-0 text-center">
+                <h5 class="mb-0 fs-5 fw-semibold">Perfil de usuario</h5>
+            </div>
+            <div class="d-flex align-items-center py-9 mx-7 border-bottom">
+                @if (Model?.PhotoData != null && Model.PhotoData.Length > 0)
+                {
+                    <img src="@Model.PhotoBase64" width="80" height="80" alt="@Model.FullName" style="object-fit: cover;"
+                        class="rounded-circle" />
+                }
+                else if (Model != null)
+                {
+                    <div class="rounded-circle bg-success d-flex align-items-center justify-content-center"
+                        style="width: 80px; height: 80px;">
+                        <span class="text-white fw-bold fs-5">
+                            @Model.Name.Substring(0, 1)@Model.LastName.Substring(0, 1)
+                        </span>
+                    </div>
+                }
+                else
+                {
+                    <img src="~/assets/images/profile/user-1.png" class="rounded-circle" width="80" height="80"
+                        alt="Usuario" />
+                }
+                <div class="ms-3">
+                    <h5 class="text-center mb-1 fs-4">@Model?.Grade. @Model?.Name.Split(' ')[0] @Model?.LastName.Split(' ')[0]</h5>
+                    <h6 class="text-center text-muted">@Model?.AviationProfile?.FlightPosition</h6>
+                    @foreach (var role in Model?.Roles ?? [])
+                    {
+                        <span class="text-center mb-1 d-block">@role.Name</span>
+                    }
+                </div>
+            </div>
+            <div class="message-body">
+                <a asp-area="Identity" asp-controller="User" asp-action="Profile"
+                    class="py-8 px-7 mt-8 d-flex align-items-center">
+                    <span class="d-flex align-items-center justify-content-center text-bg-light rounded-1 p-6">
+                        <img src="~/assets/images/svgs/icon-account.svg" alt="imagen" width="24" height="24" />
+                    </span>
+                    <div class="w-100 ps-3">
+                        <h6 class="mb-0 fs-4 lh-base">Mi Perfil</h6>
+                        <span class="fs-3 d-block text-body-secondary">Información personal</span>
+                    </div>
+                </a>
+                <a asp-area="Identity" asp-controller="User" asp-action="ChangePassword"
+                    class="py-8 px-7 d-flex align-items-center">
+                    <span class="d-flex align-items-center justify-content-center text-bg-light rounded-1 p-6">
+                        <img src="~/assets/images/svgs/icon-inbox.svg" alt="imagen" width="24" height="24" />
+                    </span>
+                    <div class="w-100 ps-3">
+                        <h6 class="mb-0 fs-4 lh-base">Cambiar Contraseña</h6>
+                        <span class="fs-3 d-block text-body-secondary">Seguridad</span>
+                    </div>
+                </a>
+            </div>
+            <div class="d-grid py-4 px-7 pt-8 d-flex justify-content-center">
+                <form asp-area="Identity" asp-controller="Account" asp-action="Logout" method="post">
+                    <button type="submit" class="btn btn-primary">
+                        Cerrar sesión
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</li>

@@ -1,0 +1,114 @@
+@model EvaluationOverviewDto
+@{
+    string continueCourse = UserConstants.CommitteeDecisions.ContinueCourse;
+}
+
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="accordion" id="accordionCommitteeRecords">
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingCommitteeRecords">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#collapseCommitteeRecords" aria-expanded="false"
+                        aria-controls="collapseCommitteeRecords">
+                        Comités en la Fase Actual (@Model.CommitteeRecordsInCurrentPhase.Count())
+                    </button>
+                </h2>
+                <div id="collapseCommitteeRecords" class="accordion-collapse collapse"
+                    aria-labelledby="headingCommitteeRecords" data-bs-parent="#accordionCommitteeRecords">
+                    <div class="accordion-body">
+                        <div class="row">
+                            @foreach (var committee in Model.CommitteeRecordsInCurrentPhase)
+                            {
+                                <div class="col-md-6 col-lg-4 mb-3">
+                                    <div
+                                        class="card committee-card border-@(committee.IsResolved ? (committee.Decision == continueCourse ? "success" : "danger") : "warning")">
+                                        <div
+                                            class="card-header bg-@(committee.IsResolved ? (committee.Decision == continueCourse ? "success" : "danger") : "warning") text-white">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <h6 class="mb-0">
+                                                    <i class="ti ti-file-text me-1"></i>
+                                                    @if (committee.CommitteeNumber > 0)
+                                                    {
+                                                        <span>Comité Nº @committee.CommitteeNumber</span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span>Comité Automático</span>
+                                                    }
+                                                </h6>
+                                            </div>
+                                        </div>
+                                        <div class="card-body">
+
+                                            <!-- Razón -->
+                                            <div class="mb-3">
+                                                <small class="text-muted d-block mb-1">
+                                                    <i class="ti ti-alert-circle me-1"></i>
+                                                    <strong>Razón:</strong>
+                                                </small>
+                                                <p class="mb-0 small">@committee.Reason</p>
+                                            </div>
+
+                                            @if (committee.IsResolved)
+                                            {
+                                                <!-- Acta -->
+                                                @if (!string.IsNullOrEmpty(committee.ActaNumber))
+                                                {
+                                                    <div class="mb-3">
+                                                        <small class="text-muted d-block mb-1">
+                                                            <i class="ti ti-file-certificate me-1"></i>
+                                                            <strong>Acta:</strong>
+                                                        </small>
+                                                        <span class="badge bg-info">@committee.ActaNumber</span>
+                                                    </div>
+                                                }
+
+                                                <!-- Decisión -->
+                                                <div class="mb-3">
+                                                    <small class="text-muted d-block mb-1">
+                                                        <i class="ti ti-checkbox me-1"></i>
+                                                        <strong>Decisión:</strong>
+                                                    </small>
+                                                    <span
+                                                        class="badge bg-@(committee.Decision == continueCourse ? "success" : "danger")">
+                                                        @committee.Decision
+                                                    </span>
+
+                                                </div>
+
+                                                <!-- Observaciones de la Decisión -->
+                                                @if (!string.IsNullOrEmpty(committee.DecisionObservations))
+                                                {
+                                                    <div class="mb-0">
+                                                        <small class="text-muted d-block mb-1">
+                                                            <i class="ti ti-message-2 me-1"></i>
+                                                            <strong>Observaciones:</strong>
+                                                        </small>
+                                                        <p class="mb-0 small text-justify">
+                                                            @committee.DecisionObservations
+                                                        </p>
+                                                    </div>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <!-- Estado Pendiente -->
+                                                <div class="alert alert-warning mb-0 py-2">
+                                                    <small class="mb-0">
+                                                        <i class="ti ti-clock me-1"></i>
+                                                        Esperando decisión del comité
+                                                    </small>
+                                                </div>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

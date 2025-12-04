@@ -1,0 +1,73 @@
+@model EvaluationOverviewDto
+@{
+    string pendingCommittee = UserConstants.StudentStatus.PendingCommittee;
+    string suspended = UserConstants.StudentStatus.Suspended;
+    string viewType = ViewBag.ViewType;
+}
+
+<div class="row">
+    <div class="col-12">
+        <div class="student-info-card">
+            <div class="row align-items-center">
+                <div class="col-12 col-md-8 mb-3 mb-md-0">
+                    <div class="row align-items-center">
+                        <div class="col-4 col-sm-3 col-md-2 text-center">
+                            @if (Model.PhotoBase64 != null)
+                            {
+                                <img src="@Model.PhotoBase64" alt="@Model.StudentFullName" class="img-fluid rounded"
+                                    style="width: 100%; max-width: 80px; height: auto; aspect-ratio: 1/1; object-fit: cover;">
+                            }
+                            else
+                            {
+                                <div class="rounded-circle bg-success d-flex align-items-center justify-content-center mx-auto"
+                                    style="width: 70px; height: 70px; max-width: 100%;">
+                                    <span class="text-white fw-bold fs-6">
+                                        @Model.StudentFullName.Substring(0, 1)
+                                    </span>
+                                </div>
+                            }
+                        </div>
+                        <div class="col-8 col-sm-9 col-md-10">
+                            <h3 class="mb-2 fs-5 fs-md-4">
+                                @Model.StudentFullName
+
+                                @if (Model.Status == pendingCommittee)
+                                {
+                                    <span class="badge bg-danger d-block d-sm-inline mt-1 mt-sm-0">En Comité</span>
+                                }
+                                else if (Model.Status == suspended)
+                                {
+                                    <span class="badge bg-danger d-block d-sm-inline mt-1 mt-sm-0">Programa
+                                        Suspendido</span>
+                                }
+                            </h3>
+                            <p class="mb-1 small"><strong>Identificación:</strong> @Model.StudentIdentification</p>
+                            <p class="mb-0 small"><strong>Programa:</strong> @Model.CourseName</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-md-4">
+                    <div class="phase-progress text-center">
+                        <h5 class="mb-2">@Model.CurrentPhase.Name</h5>
+                        <p class="mb-1">Fase @Model.CurrentPhase.PhaseNumber</p>
+
+                        @if (viewType != AviationConstants.NonEvaluableMission)
+                        {
+                            <p class="mb-1">@ViewBag.PhaseProgress</p>
+
+                            <hr class="my-2" />
+
+                            <div class="text-center">
+                                <p class="mb-1 small">Total misiones insatisfactorias (Programa):
+                                    @Model.TotalFailedMissionsInCourse
+                                </p>
+                                <p class="mb-0 small">Misiones insatisfactorias (Últimas 4 misiones):
+                                    @Model.FailedMissionsInWindow</p>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

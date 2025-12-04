@@ -1,0 +1,111 @@
+@model LoginDto
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="es" dir="ltr" data-bs-theme="light" data-color-theme="Blue_Theme" data-layout="vertical">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Favicon icon-->
+    <link rel="shortcut icon" type="image/x-icon" href="~/favicon.ico" />
+
+    <!-- Core Css -->
+    <link rel="stylesheet" href="~/assets/css/styles.css" />
+
+    <style>
+        .btn-primary {
+            background: linear-gradient(135deg, var(--ponal-primary-dark) 0%, var(--ponal-primary) 60%, var(--ponal-primary-light) 100%);
+            border: 1px solid rgba(46, 125, 50, 0.5);
+            box-shadow: 0 4px 6px rgba(46, 125, 50, 0.3);
+            transition: all 0.3s ease;
+            font-weight: 600;
+            color: #ffffff !important;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #164a19 0%, #2e7d32 60%, #43a047 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(46, 125, 50, 0.4);
+            border-color: rgba(46, 125, 50, 0.6);
+            color: #ffffff !important;
+        }
+    </style>
+
+    <title>Acceso de usuario</title>
+</head>
+
+<body>
+    <!-- Preloader -->
+    <div class="preloader">
+        <img src="~/assets/images/logos/preloader.svg" alt="loader" class="lds-ripple img-fluid" />
+    </div>
+    <div id="main-wrapper" class="auth-customizer-none">
+        <div class="position-relative overflow-hidden radial-gradient min-vh-100 w-100">
+            <div class="position-relative z-index-5">
+                <div class="row justify-content-center">
+                    <div class="col-12">
+                        <div class="authentication-login min-vh-100 bg-body row justify-content-center align-items-center p-4"
+                            style="background-image: url('@Url.Content("~/assets/images/backgrounds/fondo_verde_navbar.webp")');">
+                            <div class="auth-max-width col-sm-8 col-md-6 col-xl-5 col-xxl-4 px-4">
+                                <h2 class="mb-1 fs-7 fw-bolder text-white text-center">Bienvenido a SICAF</h2>
+                                <div class="text-center my-3 my-md-4">
+                                    <img src="~/assets/images/institutional/escudo_esavi-removebg.png" class="img-fluid"
+                                        style="max-width: 180px; width: 100%; height: auto;" alt="logo">
+                                </div>
+                                <p class="mb-7 text-center text-white">Ingrese sus credenciales de acceso.</p>
+
+                                <form asp-area="Identity" asp-controller="Account" asp-action="Login"
+                                    asp-route-returnUrl="@ViewData["ReturnUrl"]" method="post" class="needs-validation"
+                                    novalidate>
+
+                                    <div asp-validation-summary="ModelOnly" class="text-danger text-center"
+                                        role="alert"></div>
+
+                                    <div class="mb-3">
+                                        <label asp-for="Username" class="form-label text-white"></label>
+                                        <input asp-for="Username" class="form-control text-light" required>
+                                        <span asp-validation-for="Username" class="text-danger"></span>
+                                    </div>
+                                    <div class="mb-4">
+                                        <label asp-for="Password" class="form-label text-white"></label>
+                                        <input asp-for="Password" class="form-control" required>
+                                        <span asp-validation-for="Password" class="text-danger"></span>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary w-100 py-8 mb-4 rounded-2">
+                                        Iniciar sesión
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="dark-transparent sidebartoggler"></div>
+    <!-- Import Js Files -->
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/assets/libs/simplebar/dist/simplebar.min.js"></script>
+    <script src="~/assets/js/theme/app.init.js"></script>
+    <script src="~/assets/js/theme/theme.js"></script>
+    <script src="~/assets/js/theme/app.min.js"></script>
+    <script src="~/assets/js/theme/sidebarmenu.js"></script>
+
+
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <!-- Bootstrap validation -->
+    <script src="~/assets/js/plugins/bootstrap-validation-init.js"></script>
+
+</body>
+
+</html>

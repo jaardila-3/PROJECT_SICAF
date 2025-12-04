@@ -1,0 +1,208 @@
+@model IEnumerable<UserDto>
+
+@{
+    ViewData["Title"] = "Administración Usuarios";
+}
+
+<nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb rounded">
+        <li class="breadcrumb-item">
+            <a href="@Url.Action("Index", "Home", new { area = "" })" class="text-success d-flex align-items-center">
+                <i class="ti ti-home fs-4 mt-1"></i>
+            </a>
+        </li>
+        <li class="breadcrumb-item text-success active" aria-current="page">Usuarios</li>
+    </ol>
+</nav>
+
+<div class="">
+    <div class="row mb-3">
+        <div class="col-md-6 col-sm-12">
+            <h4 class="page-title text-truncate font-weight-medium mb-1">@ViewData["Title"]</h4>
+        </div>
+        <div class="col-lg-6 col-md-6 col-sm-12 align-self-center">
+            <div class="text-end">
+                <a asp-action="Create" class="btn btn-success text-white">
+                    <i class="ti ti-plus me-2"></i>Nuevo Usuario
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Lista de Usuarios</h4>
+                    <h6 class="card-subtitle mb-3">Administración de usuarios del sistema</h6>
+
+                    <div class="table-responsive">
+                        <table id="userTable"
+                            class="datatablesAdvancedJQuery table table-striped table-bordered text-nowrap align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Documento</th>
+                                    <th>Grado</th>
+                                    <th>Nombre Completo</th>
+                                    <th>Tipo de Ala</th>
+                                    <th>Fuerza</th>
+                                    <th>Roles</th>
+                                    <th>Estado</th>
+                                    <th class="no-export">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var user in Model.OrderBy(u => u.GradeOrder).ThenBy(u => u.SeniorityOrder))
+                                {
+                                    <tr>
+                                        <td>@user.FullIdentification</td>
+                                        <td>@(string.IsNullOrEmpty(user.Grade) ? "-" : user.Grade)</td>
+                                        <td>@user.FullName</td>
+                                        <td>@user.AviationProfile?.WingType</td>
+                                        <td>
+                                            @if (!string.IsNullOrEmpty(user.Force))
+                                            {
+                                                <span class="badge bg-dark">@user.Force</span>
+                                            }
+                                            else
+                                            {
+                                                <span>-</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            @if (user.Roles != null && user.Roles.Any())
+                                            {
+                                                @foreach (var role in user.Roles.OrderBy(r => r.Name))
+                                                {
+                                                    <span class="badge bg-success rounded-pill m-1">@role.Name</span>
+                                                    <br>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-secondary rounded-pill">Sin rol</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            @if (!user.IsLockedOut)
+                                            {
+                                                <div class="">
+                                                    <label class="text-success">Activo</label>
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <div class="">
+                                                    <label class="text-danger">Bloqueado</label>
+                                                </div>
+                                            }
+                                        </td>
+                                        <td>
+                                            <div class="btn-group" role="group">
+                                                <a asp-action="Details" asp-route-id="@user.Id"
+                                                    class="btn btn-sm btn-success text-white" title="Ver detalles">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                                <a asp-action="Edit" asp-route-id="@user.Id"
+                                                    class="btn btn-sm btn-warning text-white" title="Editar">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                <button type="button"
+                                                    class="btn btn-sm btn-info reset-password-btn text-white"
+                                                    data-user-id="@user.Id" data-user-name="@user.FullName"
+                                                    title="Restablecer contraseña">
+                                                    <i class="fas fa-key"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Styles {
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="~/assets/libs/datatables.net-bs5/css/dataTables.bootstrap5.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.dataTables.min.css">
+}
+
+@section Scripts {
+    <!-- DataTables JS - Componente para tablas -->
+    <script src="~/assets/libs/datatables.net/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.print.min.js"></script>
+
+    <script src="~/assets/js/datatable/datatable-advanced.init.js"></script>
+
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function () {
+            // Usar delegación de eventos para manejar múltiples botones
+            const tableContainer = document.querySelector('#userTable');
+
+            if (tableContainer) {
+                // Manejar el clic en el botón de restablecimiento de contraseña
+                tableContainer.addEventListener('click', function (event) {
+                    const resetBtn = event.target.closest('.reset-password-btn');
+
+                    if (resetBtn) {
+                        event.preventDefault();
+                        const userId = resetBtn.getAttribute('data-user-id');
+                        const userName = resetBtn.getAttribute('data-user-name');
+
+                        Swal.fire({
+                            title: 'Restablecer Contraseña',
+                            text: `¿Está seguro de restablecer la contraseña de ${userName}?`,
+                            icon: 'question',
+                            showCancelButton: true,
+                            confirmButtonColor: '@NotificationConstants.Colors.Success',
+                            cancelButtonColor: '@NotificationConstants.Colors.Error',
+                            confirmButtonText: '@NotificationConstants.Buttons.Accept',
+                            cancelButtonText: '@NotificationConstants.Buttons.Cancel'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                fetch(`/Identity/User/ResetPassword?id=${userId}`, {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                        'X-Requested-With': 'XMLHttpRequest'
+                                    }
+                                })
+                                    .then(response => {
+                                        const result = response.json();
+                                        if (!response.ok) {
+                                            Swal.fire('Error', result.message, 'error');
+                                        }
+                                        return result;
+                                    })
+                                    .then(data => {
+                                        if (data.success) {
+                                            Swal.fire('Éxito', data.message, 'success');
+                                        } else {
+                                            Swal.fire('Error', data.message, 'error');
+                                        }
+                                    })
+                                    .catch(error => {
+                                        console.error('Error al restablecer contraseña:', error);
+                                        Swal.fire('Error', 'Error al restablecer contraseña', 'error');
+                                    });
+                            }
+                        });
+                    }
+                });
+            }
+        });
+    </script>
+}

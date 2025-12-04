@@ -1,0 +1,237 @@
+@model IEnumerable<AuditInfoDto>
+
+@{
+    ViewData["Title"] = "Auditoría del Sistema";
+    var filters = ViewBag.Filters as AuditFilterDto ?? new AuditFilterDto();
+    var hasFilters = ViewBag.HasFilters ?? false;
+}
+
+<nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb rounded">
+        <li class="breadcrumb-item">
+            <a href="@Url.Action("Index", "Home", new { area = "" })" class="text-success d-flex align-items-center">
+                <i class="ti ti-home fs-4 mt-1"></i>
+            </a>
+        </li>
+        <li class="breadcrumb-item text-success active" aria-current="page">Auditoría</li>
+    </ol>
+</nav>
+
+<div class="">
+    <div class="row mb-3">
+        <div class="col-md-6 col-sm-12">
+            <h4 class="page-title text-truncate font-weight-medium mb-1">@ViewData["Title"]</h4>
+        </div>
+        <div class="col-lg-6 col-md-6 col-sm-12 align-self-center">
+            <div class="text-end">
+                <button type="button" class="btn btn-primary text-white" data-bs-toggle="modal"
+                    data-bs-target="#filterModal">
+                    <i class="ti ti-filter me-1"></i> Filtros
+                </button>
+                @if (hasFilters)
+                {
+                    <form asp-action="ClearFilters" method="post" class="d-inline">
+                        <button type="submit" class="btn btn-secondary text-white">
+                            <i class="ti ti-filter-off me-1"></i> Limpiar Filtros
+                        </button>
+                    </form>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Mostrar filtros activos -->
+@if (hasFilters)
+{
+    <div class="alert alert-info alert-dismissible fade show" role="alert">
+        <strong>Filtros aplicados:</strong>
+        @if (!string.IsNullOrWhiteSpace(filters.UserName))
+        {
+            <span class="badge bg-primary me-1">Usuario: @filters.UserName</span>
+        }
+        @if (!string.IsNullOrWhiteSpace(filters.EntityName))
+        {
+            <span class="badge bg-primary me-1">Entidad: @filters.EntityName</span>
+        }
+        @if (!string.IsNullOrWhiteSpace(filters.OperationType))
+        {
+            <span class="badge bg-primary me-1">Operación: @filters.OperationType</span>
+        }
+        @if (filters.DateFrom.HasValue)
+        {
+            <span class="badge bg-primary me-1">Desde: @filters.DateFrom.Value.ToString("dd/MM/yyyy")</span>
+        }
+        @if (filters.DateTo.HasValue)
+        {
+            <span class="badge bg-primary me-1">Hasta: @filters.DateTo.Value.ToString("dd/MM/yyyy")</span>
+        }
+    </div>
+}
+
+<div class="">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Registros de Auditoría</h4>
+                    <h6 class="card-subtitle mb-3">Historial completo de operaciones del sistema</h6>
+
+                    <div class="table-responsive">
+                        <table id="auditTable"
+                            class="datatablesAdvancedJQuery table table-striped table-bordered text-nowrap align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Fecha y Hora</th>
+                                    <th>Usuario Ejecutor</th>
+                                    <th>Operación</th>
+                                    <th>Usuario Afectado</th>
+                                    <th>IP</th>
+                                    <th class="no-export">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var log in Model)
+                                {
+                                    <tr>
+                                        <td data-sort="@log.CreatedAt.ToString("yyyyMMddHHmmss")">
+                                            @log.CreatedAt.ToString("dd/MM/yyyy HH:mm:ss")
+                                        </td>
+                                        <td>
+                                            @if (!string.IsNullOrEmpty(log.UserName))
+                                            {
+                                                <span class="text-primary">@log.UserName</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">Sistema</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            <span class="badge @GetOperationBadgeClass(log.OperationType)">
+                                                @log.OperationType
+                                            </span>
+                                        </td>
+                                        <td>
+                                            @if (!string.IsNullOrEmpty(log.AffectedUserIdentificationName))
+                                            {
+                                                <span class="text-info">@log.AffectedUserIdentificationName</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">-</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            <small>@(log.IpAddress ?? "-")</small>
+                                        </td>
+                                        <td>
+                                            <a asp-action="Details" asp-route-id="@log.Id"
+                                                class="btn btn-sm btn-info text-white" title="Ver detalles">
+                                                <i class="ti ti-eye"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Filtros -->
+<div class="modal fade" id="filterModal" tabindex="-1" aria-labelledby="filterModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <form asp-action="Index" method="get">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title text-white" id="filterModalLabel">
+                        <i class="ti ti-filter me-2"></i>Filtros de Búsqueda
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="@filters.UserName" class="form-label">Usuario Ejecutor</label>
+                            <input asp-for="@filters.UserName" class="form-control" placeholder="Nombre de usuario">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="@filters.AffectedUserIdentificationName" class="form-label">Usuario
+                                Afectado</label>
+                            <input asp-for="@filters.AffectedUserIdentificationName" class="form-control"
+                                placeholder="Usuario afectado">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="@filters.OperationType" class="form-label"></label>
+                            <select asp-for="@filters.OperationType" class="form-select">
+                                <option value="">-- Todas --</option>
+                                @foreach (var operation in (List<string>)ViewBag.OperationTypes)
+                                {
+                                    <option value="@operation">@operation</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="@filters.DateFrom" class="form-label"></label>
+                            <input asp-for="@filters.DateFrom" class="form-control">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="@filters.DateTo" class="form-label"></label>
+                            <input asp-for="@filters.DateTo" class="form-control">
+                        </div>
+                        <div class="col-12 mb-3">
+                            <label asp-for="@filters.IpAddress" class="form-label"></label>
+                            <input asp-for="@filters.IpAddress" class="form-control" placeholder="Dirección IP">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="ti ti-search me-1"></i>Aplicar Filtros
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@functions {
+    private string GetOperationBadgeClass(string operationType)
+    {
+        return operationType switch
+        {
+            DatabaseOperationType.Create => "bg-success",
+            DatabaseOperationType.Update or DatabaseOperationType.UnassignedInstructor => "bg-warning",
+            DatabaseOperationType.AdminResetPassword or DatabaseOperationType.ChangePassword => "bg-warning",
+            DatabaseOperationType.ChangeCourse or DatabaseOperationType.Unlock => "bg-warning",
+            DatabaseOperationType.Delete or DatabaseOperationType.Lock => "bg-danger",
+            DatabaseOperationType.Read => "bg-info",
+            DatabaseOperationType.Login => "bg-primary",
+            _ => "bg-secondary"
+        };
+    }
+}
+
+@section Styles {
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="~/assets/libs/datatables.net-bs5/css/dataTables.bootstrap5.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.dataTables.min.css">
+}
+
+@section Scripts {
+    <!-- DataTables JS -->
+    <script src="~/assets/libs/datatables.net/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.print.min.js"></script>
+    <script src="~/assets/js/datatable/datatable-advanced.init.js"></script>
+}

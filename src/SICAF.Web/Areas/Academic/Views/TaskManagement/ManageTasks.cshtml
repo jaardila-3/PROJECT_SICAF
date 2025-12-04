@@ -1,0 +1,230 @@
+@model PhaseTasksDto
+@using SICAF.Common.DTOs.Academic
+
+@{
+    ViewData["Title"] = $"Gestionar Tareas - {Model.PhaseName}";
+}
+
+<nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb rounded">
+        <li class="breadcrumb-item">
+            <a href="@Url.Action("Index", "Home", new { area = "" })" class="text-success d-flex align-items-center">
+                <i class="ti ti-home fs-4 mt-1"></i>
+            </a>
+        </li>
+        <li class="breadcrumb-item">
+            <a asp-action="Index" class="text-success">Tareas</a>
+        </li>
+        <li class="breadcrumb-item text-success active" aria-current="page">@Model.PhaseName</li>
+    </ol>
+</nav>
+
+<div class="">
+    <div class="row mb-3">
+        <div class="col-md-8 col-sm-12">
+            <h4 class="page-title text-truncate font-weight-medium mb-1">@Model.PhaseName - Gestión de Tareas</h4>
+            <p class="text-muted">Fase @Model.PhaseNumber | @Model.WingType | @Model.Missions.Count misiones</p>
+        </div>
+    </div>
+</div>
+
+<div class="">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <!-- Instrucciones -->
+                    <div class="alert alert-info mb-4">
+                        <h6><i class="ti ti-info-circle me-2"></i>Instrucciones</h6>
+                        <ul class="mb-0">
+                            <li><strong>Nombre:</strong> Editar el nombre afectará a TODAS las fases y misiones que usen
+                                esta tarea (se mostrará advertencia)</li>
+                            <li><strong>Orden:</strong> Arrastre las filas <i class="ti ti-grip-vertical"></i> para
+                                reorganizar</li>
+                            <li><strong>P3:</strong> Marque si es P3 en esta fase y seleccione desde qué misión debe ser
+                                P3</li>
+                        </ul>
+                    </div>
+
+                    <!-- Advertencia global sobre tareas del Programa -->
+                    <div class="alert alert-warning">
+                        <i class="ti ti-alert-triangle me-2"></i>
+                        <strong>Importante:</strong> Estas son tareas del Programa completo. Los cambios en nombres
+                        afectarán todas las fases que usen estas tareas.
+                    </div>
+
+                    <form id="taskManagementForm">
+                        <input type="hidden" name="PhaseId" id="PhaseId" value="@Model.PhaseId" />
+                        @Html.AntiForgeryToken()
+
+                        <!-- Tabla de tareas -->
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-hover" id="tasksTable">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th style="width: 50px;"></th>
+                                        <th style="width: 70px;">Orden</th>
+                                        <th style="min-width: 300px;">Nombre de la Tarea</th>
+                                        <th style="width: 100px;" class="text-center">Es P3</th>
+                                        <th style="width: 180px;" class="text-center">Desde Misión</th>
+                                        <th style="width: 100px;" class="text-center">Uso</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tasksSortable">
+                                    @{
+                                        var index = 0;
+                                    }
+                                    @foreach (var task in Model.Tasks)
+                                    {
+                                        <tr data-task-id="@task.TaskId" data-task-index="@index">
+                                            <td class="text-center">
+                                                <span class="drag-handle" style="cursor: move;"
+                                                    title="Arrastrar para ordenar">
+                                                    <i class="ti ti-grip-vertical fs-4"></i>
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <input type="number" readonly
+                                                    class="form-control form-control-sm display-order-input"
+                                                    value="@(index + 1)" min="1" data-original-order="@(index + 1)" />
+                                            </td>
+                                            <td>
+                                                <input type="text" class="form-control form-control-sm task-name-input"
+                                                    value="@task.Name" data-original-name="@task.Name"
+                                                    data-total-phases="@task.TotalPhasesUsingThisTask"
+                                                    data-total-missions="@task.TotalMissionsUsingThisTask" />
+                                                <small class="text-muted task-usage-info" style="display: none;">
+                                                    <i class="ti ti-alert-triangle text-warning"></i>
+                                                    Usada en <span
+                                                        class="usage-phases">@task.TotalPhasesUsingThisTask</span> fases,
+                                                    <span class="usage-missions">@task.TotalMissionsUsingThisTask</span>
+                                                    misiones
+                                                </small>
+                                            </td>
+                                            <td class="text-center">
+                                                <div class="form-check form-switch d-flex justify-content-center">
+                                                    <input class="form-check-input p3-checkbox" type="checkbox"
+                                                        @(task.IsP3InThisPhase ? "checked" : "")
+                                                        data-original-p3="@task.IsP3InThisPhase.ToString().ToLower()" />
+                                                </div>
+                                            </td>
+                                            <td class="text-center">
+                                                <select class="form-select form-select-sm p3-mission-select"
+                                                    @(task.IsP3InThisPhase ? "" : "disabled")
+                                                    data-original-mission="@(task.P3StartingFromMission?.ToString() ?? "")">
+                                                    <option value="">-</option>
+                                                    @foreach (var mission in Model.Missions)
+                                                    {
+                                                        var isSelected = task.P3StartingFromMission == mission.MissionNumber;
+                                                        <option value="@mission.MissionNumber" selected="@isSelected">
+                                                            Misión @mission.MissionNumber
+                                                        </option>
+                                                    }
+                                                </select>
+                                            </td>
+                                            <td class="text-center">
+                                                <button type="button" class="btn btn-sm btn-outline-info btn-usage-info"
+                                                    title="Ver uso detallado">
+                                                    <i class="ti ti-info-circle"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        index++;
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Advertencia de cambios de nombre (oculta por defecto) -->
+                        <div class="alert alert-warning mt-3" id="nameChangeWarning" style="display: none;">
+                            <h6><i class="ti ti-alert-triangle me-2"></i>Advertencia de Cambio de Nombres</h6>
+                            <p class="mb-2">Ha modificado el nombre de las siguientes tareas:</p>
+                            <ul id="nameChangeList" class="mb-2"></ul>
+                            <p class="mb-0"><strong>Estos cambios afectarán a TODAS las fases y misiones que usen estas
+                                    tareas.</strong></p>
+                        </div>
+
+                        <!-- Botones de acción -->
+                        <div class="d-flex justify-content-between mt-4">
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="ti ti-arrow-left me-1"></i>
+                                Volver
+                            </a>
+                            <button type="button" id="btnSaveChanges" class="btn btn-success"
+                                data-save-url="@Url.Action("SaveTasks")">
+                                <i class="ti ti-device-floppy me-1"></i>
+                                Guardar Cambios
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <!-- dragula CSS -->
+    <link rel="stylesheet" href="~/assets/libs/dragula/dist/dragula.min.css">
+    <style>
+        /* Solución para drag & drop en dispositivos móviles */
+        #tasksSortable {
+            touch-action: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        #tasksSortable tr {
+            touch-action: none;
+        }
+
+        .drag-handle {
+            touch-action: none;
+            cursor: move;
+            cursor: grab;
+        }
+
+        .drag-handle:active {
+            cursor: grabbing;
+        }
+
+        /* Evitar selección de texto durante el drag */
+        .gu-mirror {
+            touch-action: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+    </style>
+}
+
+@section Scripts {
+    <script src="~/assets/libs/dragula/dist/dragula.min.js"></script>
+
+    <!-- Fix para eventos táctiles en dispositivos móviles -->
+    <script>
+        // Prevenir scroll durante el drag en móviles
+        document.addEventListener('DOMContentLoaded', function () {
+            var tbody = document.getElementById('tasksSortable');
+            if (tbody) {
+                // Prevenir el comportamiento por defecto en eventos táctiles
+                tbody.addEventListener('touchstart', function (e) {
+                    if (e.target.closest('.drag-handle')) {
+                        e.preventDefault();
+                    }
+                }, { passive: false });
+
+                tbody.addEventListener('touchmove', function (e) {
+                    if (e.target.closest('.drag-handle') || e.target.closest('.gu-mirror')) {
+                        e.preventDefault();
+                    }
+                }, { passive: false });
+            }
+        });
+    </script>
+
+    <script src="~/js/Areas/Academic/TaskManagement/manage-tasks.js"></script>
+}

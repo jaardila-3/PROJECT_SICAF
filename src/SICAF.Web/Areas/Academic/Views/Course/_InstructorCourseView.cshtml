@@ -1,0 +1,134 @@
+@using static SICAF.Common.Constants.UserConstants
+@model CourseDto
+
+@{
+    var aircraftFilter = ViewBag.WingTypeFilter as string;
+}
+
+<div class="row">
+    <!-- Información del programa - Vista Instructor -->
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header bg-success">
+                <h5 class="mb-0 text-white">
+                    <i class="ti ti-user-check me-2"></i>
+                    Mi Programa Asignado
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="text-center mb-3">
+                    <h3 class="text-primary">
+                        <span class="badge bg-dark">@Model.CourseNumber</span>
+                    </h3>
+                    <h4>@Model.CourseName</h4>
+                    <span class="badge @Model.StatusBadgeClass">@Model.StatusCourse</span>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <tbody>
+                            <tr>
+                                <td><strong>Fecha de Inicio:</strong></td>
+                                <td>@Model.StartDate.ToString("dd/MM/yyyy")</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Fecha de Fin:</strong></td>
+                                <td>@Model.EndDate.ToString("dd/MM/yyyy")</td>
+                            </tr>
+                            @if (!string.IsNullOrEmpty(aircraftFilter))
+                            {
+                                <tr>
+                                    <td><strong>Tipo de Ala:</strong></td>
+                                    <td>
+                                        <span class="badge bg-info">@aircraftFilter</span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Mis Estudiantes:</strong></td>
+                                    <td>
+                                        <span class="badge bg-success ms-2">@Model.UserCourses.Count</span>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mis Estudiantes - Vista Instructor -->
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header bg-primary">
+                <h5 class="mb-0 text-white">
+                    <i class="ti ti-users me-2"></i>
+                    Mis Estudiantes
+                    @if (!string.IsNullOrEmpty(aircraftFilter))
+                    {
+                        <span class="badge bg-info ms-2">Ala @aircraftFilter</span>
+                    }
+                </h5>
+            </div>
+            <div class="card-body">
+                @if (Model.UserCourses.Any())
+                {
+                    <!-- Tabla de estudiantes -->
+                    <div class="table-responsive">
+                        <table class="datatablesJQuery table table-hover">
+                            <thead>
+                                <tr>
+                                    <th class="text-center">Grado Nombres y Apellidos</th>
+                                    <th class="text-center">PID</th>
+                                    <th class="text-center">Estado</th>
+                                    <th class="text-center">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                                @foreach (var student in Model.UserCourses.OrderBy(x => x.User?.GradeOrder).ThenBy(x =>
+                                                            x.User?.SeniorityOrder))
+                                {
+                                    <tr>
+                                        <td>@student.User?.FullName</td>
+                                        <td class="text-center">@student.User?.AviationProfile?.PID</td>
+                                        <td class="text-center">
+                                            <span
+                                                class="badge @StudentStatus.GetStatusBadgeClass(student.Status)">@student.Status
+                                            </span>
+                                        </td>
+                                        <td class="text-center">
+                                            @if (Model.StatusCourse == CourseConstants.CourseStatus.Active)
+                                            {
+                                                if (student.Status != StudentStatus.CourseCompleted)
+                                                {
+                                                    <a asp-area="Instructor" asp-controller="Evaluation" asp-action="EvaluateStudent"
+                                                        asp-route-studentId="@student.UserId" asp-route-courseId="@Model.Id"
+                                                        class="btn btn-sm btn-success" title="Evaluar Estudiante"> Evaluar
+                                                    </a>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-success">
+                                                        <i class="ti ti-check"></i> Completado
+                                                    </span>
+                                                }
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <div class="alert alert-info text-center" role="alert">
+                        <i class="ti ti-info-circle me-2"></i>
+                        No tienes estudiantes asignados en este programa para tu tipo de ala.
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

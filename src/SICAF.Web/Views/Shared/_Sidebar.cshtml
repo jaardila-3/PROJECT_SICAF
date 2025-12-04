@@ -1,0 +1,143 @@
+<!-- Sidebar Start -->
+<aside class="left-sidebar with-vertical">
+    <div><!-- ---------------------------------- -->
+        <!-- Start Vertical Layout Sidebar -->
+        <!-- ---------------------------------- -->
+        <div class="brand-logo d-flex align-items-center justify-content-between">
+            <a asp-area="" asp-controller="Home" asp-action="Index" class="text-nowrap logo-img">
+                <img src="~/assets/images/logos/light-logo.svg" class="light-logo" alt="Logo-light" />
+                <img src="~/assets/images/logos/light-logo.svg" class="dark-logo" alt="Logo-Dark" />
+
+            </a>
+            <a href="javascript:void(0)" class="sidebartoggler ms-auto text-decoration-none fs-5 d-block d-xl-none">
+                <i class="ti ti-x"></i>
+            </a>
+        </div>
+
+
+        <nav class="sidebar-nav scroll-sidebar" data-simplebar>
+            <ul id="sidebarnav">
+                <!-- ---------------------------------- -->
+                <!-- Home -->
+                <!-- ---------------------------------- -->
+                <li class="nav-small-cap">
+                    <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
+                    <span class="hide-menu">Inicio</span>
+                </li>
+                <!-- ---------------------------------- -->
+                <!-- Dashboard -->
+                <!-- ---------------------------------- -->
+                <li class="sidebar-item">
+                    <a class="sidebar-link" asp-area="" asp-controller="Home" asp-action="Index" aria-expanded="false">
+                        <span>
+                            <i class="ti ti-aperture"></i>
+                        </span>
+                        <span class="hide-menu">Inicio</span>
+                    </a>
+                </li>
+                @if (User.IsInRole(SystemRoles.USERS_ADMIN) || User.IsInRole(SystemRoles.ACADEMIC_ADMIN))
+                {
+
+                    <!-- ---------------------------------- -->
+                    <!-- ADMIN -->
+                    <!-- ---------------------------------- -->
+                    <li class="sidebar-item">
+                        <a class="sidebar-link has-arrow" href="javascript:void(0)" aria-expanded="false">
+                            <span class="d-flex">
+                                <i class="ti ti-user-circle"></i>
+                            </span>
+                            <span class="hide-menu">Administración</span>
+                        </a>
+                        <ul aria-expanded="false" class="collapse first-level">
+                            <li class="sidebar-item">
+                                <a asp-area="Identity" asp-controller="User" asp-action="Index" class="sidebar-link">
+                                    <div class="round-16 d-flex align-items-center justify-content-center">
+                                        <i class="ti ti-circle"></i>
+                                    </div>
+                                    <span class="hide-menu">Usuarios</span>
+                                </a>
+                            </li>
+                            @if (User.IsInRole(SystemRoles.USERS_ADMIN))
+                            {
+                                <li class="sidebar-item">
+                                    <a asp-area="Identity" asp-controller="Role" asp-action="Index" class="sidebar-link">
+                                        <div class="round-16 d-flex align-items-center justify-content-center">
+                                            <i class="ti ti-circle"></i>
+                                        </div>
+                                        <span class="hide-menu">Roles</span>
+                                    </a>
+                                </li>
+                                <li class="sidebar-item">
+                                    <a asp-area="Identity" asp-controller="Audit" asp-action="Index" class="sidebar-link">
+                                        <div class="round-16 d-flex align-items-center justify-content-center">
+                                            <i class="ti ti-circle"></i>
+                                        </div>
+                                        <span class="hide-menu">Auditoría</span>
+                                    </a>
+                                </li>
+                            }
+                        </ul>
+                    </li>
+                }
+                <!-- ---------------------------------- -->
+                <!-- Módulos -->
+                <!-- ---------------------------------- -->
+                @if (User.IsInRole(SystemRoles.ACADEMIC_ADMIN) || User.IsInRole(SystemRoles.INSTRUCTOR) ||
+                                User.IsInRole(SystemRoles.STUDENT))
+                {
+                    <li class="nav-small-cap">
+                        <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
+                        <span class="hide-menu">Módulos</span>
+                    </li>
+
+                    <li class="sidebar-item">
+                        <a class="sidebar-link has-arrow" href="javascript:void(0)" aria-expanded="false">
+                            <span class="d-flex">
+                                <i class="ti ti-layout-kanban"></i>
+                            </span>
+                            <span class="hide-menu">Académico</span>
+                        </a>
+                        <ul aria-expanded="false" class="collapse first-level">
+                            <li class="sidebar-item">
+                                <a asp-area="Academic" asp-controller="Course" asp-action="Index" class="sidebar-link">
+                                    <div class="round-16 d-flex align-items-center justify-content-center">
+                                        <i class="ti ti-circle"></i>
+                                    </div>
+                                    <span class="hide-menu">Programas</span>
+                                </a>
+                            </li>
+                            @if (User.IsInRole(SystemRoles.ACADEMIC_ADMIN) || User.IsInRole(SystemRoles.INSTRUCTOR))
+                            {
+                                <li class="sidebar-item">
+                                    <a asp-area="Reports" asp-controller="Report" asp-action="Index" class="sidebar-link">
+                                        <div class="round-16 d-flex align-items-center justify-content-center">
+                                            <i class="ti ti-circle"></i>
+                                        </div>
+                                        <span class="hide-menu">Informes</span>
+                                    </a>
+                                </li>
+                            }
+                            @if (User.IsInRole(SystemRoles.ACADEMIC_ADMIN) || User.IsInRole(SystemRoles.INSTRUCTOR))
+                            {
+                                <li class="sidebar-item">
+                                    <a asp-area="Academic" asp-controller="TaskManagement" asp-action="Index"
+                                        class="sidebar-link">
+                                        <div class="round-16 d-flex align-items-center justify-content-center">
+                                            <i class="ti ti-circle"></i>
+                                        </div>
+                                        <span class="hide-menu">Tareas</span>
+                                    </a>
+                                </li>
+                            }
+                        </ul>
+                    </li>
+                }
+            </ul>
+        </nav>
+
+        <!-- ---------------------------------- -->
+        <!-- Start Vertical Layout Sidebar -->
+        <!-- ---------------------------------- -->
+    </div>
+</aside>
+<!--  Sidebar End -->

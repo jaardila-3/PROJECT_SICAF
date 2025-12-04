@@ -1,0 +1,431 @@
+@using static SICAF.Common.Constants.UserConstants
+@model GeneralReportDto
+
+@{
+    ViewData["Title"] = "Informe Académico General";
+}
+
+<nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb rounded">
+        <li class="breadcrumb-item">
+            <a href="@Url.Action("Index", "Home", new { area = "" })" class="text-success d-flex align-items-center">
+                <i class="ti ti-home fs-4 mt-1"></i>
+            </a>
+        </li>
+        <li class="breadcrumb-item">
+            <a href="@Url.Action("Index", "Report", new { area = "Reports" })" class="text-success">Informes</a>
+        </li>
+        <li class="breadcrumb-item text-success active" aria-current="page">Informe General</li>
+    </ol>
+</nav>
+
+<div class="container-fluid bg-white p-4">
+
+    <div class="mb-4">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h4 class="page-title text-truncate font-weight-medium mb-1">
+                            <i class="ti ti-file-chart me-2"></i>Informe Académico General
+                        </h4>
+                        <p class="text-muted mb-0">@Model.CourseName</p>
+                    </div>
+
+                    <div>
+                        <form asp-action="GeneralReportPDF" asp-controller="QuestPDF" asp-area="Reports" method="post"
+                            target="_blank">
+                            <input type="hidden" name="CourseId" value="@Model.CourseId" />
+                            <input type="hidden" name="Force" value="@Model.Force" />
+                            <input type="hidden" name="WingType" value="@Model.WingType" />
+                            <input type="hidden" name="PhaseId" value="@Model.PhaseId" />
+                            <button type="submit" class="btn btn-primary">
+                                <i class="ti ti-file-type-pdf me-1"></i>Descargar PDF
+                            </button>
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Información del programa -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0 text-white">
+                        <i class="ti ti-info-circle me-2"></i>Información del Programa
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label fw-semibold text-muted">Programa:</label>
+                            <p class="mb-0">@Model.CourseName</p>
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <label class="form-label fw-semibold text-muted">Fecha Inicio:</label>
+                            <p class="mb-0">@Model.StartDate.ToString("dd/MM/yyyy")</p>
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <label class="form-label fw-semibold text-muted">Fecha Fin:</label>
+                            <p class="mb-0">@Model.EndDate.ToString("dd/MM/yyyy")</p>
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <label class="form-label fw-semibold text-muted">Fuerza:</label>
+                            <p class="mb-0">@Model.Force</p>
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <label class="form-label fw-semibold text-muted">Tipo de Ala:</label>
+                            <p class="mb-0"><span class="badge bg-success">@Model.WingType</span></p>
+                        </div>
+                        @if (!string.IsNullOrEmpty(Model.PhaseName))
+                        {
+                            <div class="col-md-3 mb-3">
+                                <label class="form-label fw-semibold text-muted">Fase Filtrada:</label>
+                                <p class="mb-0"><span class="badge bg-info">@Model.PhaseName</span></p>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Estadísticas Generales -->
+    <div class="row mb-4 g-3 align-items-stretch">
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card border-start border-primary border-4 h-100">
+                <div class="card-body d-flex align-items-center">
+                    <div class="d-flex align-items-center">
+                        <div class="me-3">
+                            <div class="rounded-circle bg-light-primary p-3">
+                                <i class="ti ti-users fs-5 text-primary"></i>
+                            </div>
+                        </div>
+                        <div>
+                            <h6 class="text-muted mb-1">Total Estudiantes</h6>
+                            <h3 class="mb-0">@Model.TotalStudents</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card border-start border-success border-4 h-100">
+                <div class="card-body d-flex align-items-center">
+                    <div class="d-flex align-items-center">
+                        <div class="me-3">
+                            <div class="rounded-circle bg-light-success p-3">
+                                <i class="ti ti-user-check fs-5 text-success"></i>
+                            </div>
+                        </div>
+                        <div>
+                            <h6 class="text-muted mb-1">Estudiantes Activos</h6>
+                            <h3 class="mb-0">@Model.ActiveStudents</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card border-start border-danger border-4 h-100">
+                <div class="card-body d-flex align-items-center">
+                    <div class="d-flex align-items-center">
+                        <div class="me-3">
+                            <div class="rounded-circle bg-light-danger p-3">
+                                <i class="ti ti-user-off fs-5 text-danger"></i>
+                            </div>
+                        </div>
+                        <div>
+                            <h6 class="text-muted mb-1">Estudiantes Suspendidos</h6>
+                            <h3 class="mb-0">@Model.SuspendedStudents</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card border-start border-warning border-4 h-100">
+                <div class="card-body d-flex align-items-center">
+                    <div class="d-flex align-items-center">
+                        <div class="me-3">
+                            <div class="rounded-circle bg-light-warning p-3">
+                                <i class="ti ti-clipboard-list fs-5 text-warning"></i>
+                            </div>
+                        </div>
+                        <div>
+                            <h6 class="text-muted mb-1">Total Comités</h6>
+                            <h3 class="mb-0">@Model.TotalCommittees</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabla de Instructores y Líderes de Vuelo -->
+    @if (Model.InstructorsTable.Any())
+    {
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="card-title mb-0 text-white">
+                            <i class="ti ti-users me-2"></i>Instructores y Líderes de Vuelo
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table id="instructorsTable"
+                                class="datatablesAdvancedJQuery table table-striped table-bordered text-nowrap align-middle">
+                                <thead>
+                                    <tr>
+                                        <th class="text-center">No.</th>
+                                        <th class="text-center">Grado Nombres y Apellidos</th>
+                                        <th class="text-center">PID</th>
+                                        <th class="text-center">Ala</th>
+                                        <th class="text-center">Rol</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var instructor in Model.InstructorsTable)
+                                    {
+                                        <tr>
+                                            <td class="text-center">@instructor.Number</td>
+                                            <td>@instructor.Grade. @instructor.FullName</td>
+                                            <td class="text-center">@instructor.PID</td>
+                                            <td class="text-center">@instructor.WingType</td>
+                                            <td class="text-center">@instructor.Role</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Tabla de Estudiantes -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h5 class="card-title mb-0 text-white">
+                        <i class="ti ti-table me-2"></i>Detalle de Estudiantes
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table id="studentsTable"
+                            class="datatablesAdvancedJQuery table table-striped table-bordered text-nowrap align-middle">
+                            <thead>
+                                <tr>
+                                    <th class="text-center ">No.</th>
+                                    <th>Grado Nombres y Apellidos</th>
+                                    <th>Identificación</th>
+                                    <th class="">PID</th>
+                                    <th class="">Fase Actual</th>
+                                    @if (!string.IsNullOrEmpty(Model.PhaseName))
+                                    {
+                                        <th class="text-center ">Estado en Fase</th>
+                                    }
+                                    <th class="text-center">Misiones<br>Completadas</th>
+                                    <th class="text-center ">Misiones<br>No Evaluables</th>
+                                    <th class="text-center">Progreso<br>(%)</th>
+                                    <th class="text-center">Promedio Académico</th>
+                                    <th class="text-center ">Misiones<br>Satisfactorias</th>
+                                    <th class="text-center ">Misiones No<br>Satisfactorias</th>
+                                    <th class="text-center ">Total Horas<br>de Vuelo</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var student in Model.Students)
+                                {
+                                    <tr>
+                                        <td class="text-center ">@student.Number</td>
+                                        <td>@student.GradeAndName</td>
+                                        <td>@student.Identification</td>
+                                        <td class="">@student.PID</td>
+                                        <td class="">@student.CurrentPhase</td>
+                                        @if (!string.IsNullOrEmpty(Model.PhaseName))
+                                        {
+                                            <td class="text-center ">
+                                                @if (!string.IsNullOrEmpty(student.PhaseStatus))
+                                                {
+                                                    <span
+                                                        class="badge @StudentStatus.GetStatusBadgeClass(student.PhaseStatus)">@student.PhaseStatus
+                                                    </span>
+                                                }
+                                            </td>
+                                        }
+                                        <td class="text-center">@student.CompletedMissions</td>
+                                        <td class="text-center ">@student.NonEvaluableMissionRecords</td>
+                                        <td class="text-center">@student.ProgressPercentage.ToString("0.00")%</td>
+                                        <td class="text-center">@student.Average.ToString("0.00")</td>
+                                        <td class="text-center ">@student.SatisfactoryMissions</td>
+                                        <td class="text-center ">@student.UnsatisfactoryMissions</td>
+                                        <td class="text-center ">@student.TotalFlightHours.ToString("0.00")</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gráficas -->
+    <div class="row mb-4">
+        <!-- Distribución de Calificaciones -->
+        <div class="col-lg-6 mb-4">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h6 class="card-title mb-0 text-white">
+                        <i class="ti ti-chart-bar me-2"></i>Distribución de Calificaciones
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div id="gradeDistributionChart"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Horas de Vuelo por Aeronave -->
+        <div class="col-lg-6 mb-4">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h6 class="card-title mb-0 text-white">
+                        <i class="ti ti-plane me-2"></i>Horas de Vuelo por Aeronave
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div id="machineFlightHoursChart"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Horas de Vuelo por Instructor -->
+        <div class="col-lg-6 mb-4">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h6 class="card-title mb-0 text-white">
+                        <i class="ti ti-user-check me-2"></i>Horas de Vuelo por Instructor
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div id="instructorFlightHoursChart"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Misiones Insatisfactorias por Aeronave -->
+        <div class="col-lg-6 mb-4">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h6 class="card-title mb-0 text-white">
+                        <i class="ti ti-alert-triangle me-2"></i>Misiones Insatisfactorias por Aeronave
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div id="machineUnsatisfactoryChart"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Misiones Insatisfactorias por Instructor -->
+        <div class="col-lg-6 mb-4">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h6 class="card-title mb-0 text-white">
+                        <i class="ti ti-user-exclamation me-2"></i>Misiones Insatisfactorias por Instructor
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div id="instructorUnsatisfactoryChart"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- N/NR por Categorías -->
+        <div class="col-lg-6 mb-4">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h6 class="card-title mb-0 text-white">
+                        <i class="ti ti-category me-2"></i>N ROJA por Categorías
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div id="nRedCategoriesChart"></div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="mb-2">
+        <a href="@Url.Action("Index", "Report")" class="btn btn-outline-secondary">
+            <i class="ti ti-arrow-left me-1"></i>Volver
+        </a>
+    </div>
+</div>
+
+@section Styles {
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="~/assets/libs/datatables.net-bs5/css/dataTables.bootstrap5.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.dataTables.min.css">
+    <style>
+        .apexcharts-bar-area {
+            cursor: pointer;
+        }
+    </style>
+}
+
+@section Scripts {
+    <!-- DataTables JS -->
+    <script src="~/assets/libs/datatables.net/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.print.min.js"></script>
+    <script src="~/assets/js/datatable/datatable-advanced.init.js"></script>
+
+    <!-- ApexCharts JS -->
+    <script src="~/assets/libs/apexcharts/dist/apexcharts.min.js"></script>
+    <script src="~/js/Areas/Reports/Report/general-report.js"></script>
+    <script>
+        $(document).ready(function () {
+
+            // ===== ApexCharts Data Preparation =====
+            var chartData = {
+                gradeDistribution: @Html.Raw(Json.Serialize(Model.GradeDistribution)),
+                machineFlightHours: @Html.Raw(Json.Serialize(Model.MachineFlightHours)),
+                instructorFlightHours: @Html.Raw(Json.Serialize(Model.InstructorFlightHours)),
+                machineUnsatisfactory: @Html.Raw(Json.Serialize(Model.MachineUnsatisfactoryMissions)),
+                instructorUnsatisfactory: @Html.Raw(Json.Serialize(Model.InstructorUnsatisfactoryMissions)),
+                nRedReasons: @Html.Raw(Json.Serialize(Model.NRedReasons))
+                };
+
+            var reportInfo = {
+                courseId: '@Model.CourseId',
+                force: '@Model.Force',
+                wingType: '@Model.WingType',
+                phaseId: @(Model.PhaseId.HasValue? Model.PhaseId.Value.ToString() : "null")
+                };
+
+            // Inicializar todas las gráficas
+            initializeAllCharts(chartData, reportInfo);
+        });
+    </script>
+
+}

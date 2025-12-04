@@ -1,0 +1,519 @@
+@using static SICAF.Common.Constants.UserConstants
+@model IndividualReportDto
+
+@{
+    ViewData["Title"] = "Informe Académico Individual";
+}
+
+<nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb rounded">
+        <li class="breadcrumb-item">
+            <a href="@Url.Action("Index", "Home", new { area = "" })" class="text-success d-flex align-items-center">
+                <i class="ti ti-home fs-4 mt-1"></i>
+            </a>
+        </li>
+        <li class="breadcrumb-item">
+            <a href="@Url.Action("Index", "Report", new { area = "Reports" })" class="text-success">Informes</a>
+        </li>
+        <li class="breadcrumb-item text-success active" aria-current="page">Informe Individual</li>
+    </ol>
+</nav>
+
+<div class="container-fluid bg-white p-4">
+
+    <!-- Encabezado -->
+    <div class="mb-4">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h4 class="page-title text-truncate font-weight-medium mb-1">
+                            <i class="ti ti-user-circle me-2"></i>Informe Académico Individual
+                        </h4>
+                        <p class="text-muted mb-0">@Model.CourseName</p>
+                    </div>
+
+                    <div>
+                        <form asp-action="IndividualReportPDF" asp-controller="QuestPDF" asp-area="Reports"
+                            method="post" target="_blank">
+                            <input type="hidden" name="StudentId" value="@Model.StudentId" />
+                            <input type="hidden" name="CourseId" value="@Model.CourseId" />
+                            <input type="hidden" name="Force" value="@Model.Force" />
+                            <input type="hidden" name="WingType" value="@Model.WingType" />
+                            <input type="hidden" name="PhaseId" value="@Model.PhaseId" />
+                            <button type="submit" class="btn btn-primary">
+                                <i class="ti ti-file-type-pdf me-1"></i>Descargar PDF
+                            </button>
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Información del Estudiante -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0 text-white">
+                        <i class="ti ti-user me-2"></i>Información del Estudiante
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-2 text-center mb-3 mb-md-0">
+                            @if (!string.IsNullOrEmpty(Model.PhotoBase64))
+                            {
+                                <img src="@Model.PhotoBase64" alt="@Model.FullName" class="img-fluid rounded"
+                                    style="width: 120px; height: 120px; object-fit: cover;">
+                            }
+                            else
+                            {
+                                <div class="rounded-circle bg-success d-flex align-items-center justify-content-center mx-auto"
+                                    style="width: 120px; height: 120px; border: 3px solid #409448;">
+                                    <span class="text-white fw-bold fs-1">
+                                        @(Model.FullName.Split(' ').FirstOrDefault()?.Substring(0,
+                                                                            1))@(Model.FullName.Split(' ').LastOrDefault()?.Substring(0, 1))
+                                    </span>
+                                </div>
+                            }
+                        </div>
+                        <div class="col-md-10">
+                            <div class="row">
+                                <div class="col-md-5 mb-3">
+                                    <label class="form-label fw-semibold text-muted">Grado y Nombre:</label>
+                                    <p class="mb-0 fw-bold">@Model.Grade. @Model.FullName</p>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <label class="form-label fw-semibold text-muted">@Model.IdentificationType:</label>
+                                    <p class="mb-0">@Model.IdentificationNumber</p>
+                                </div>
+                                <div class="col-md-2 mb-3">
+                                    <label class="form-label fw-semibold text-muted">PID:</label>
+                                    <p class="mb-0">@Model.PID</p>
+                                </div>
+                                <div class="col-md-2 mb-3">
+                                    <label class="form-label fw-semibold text-muted">Ala:</label>
+                                    <p class="mb-0">@Model.WingType</p>
+                                </div>
+                            </div>
+                            <div class="row">
+
+                                <div class="col-md-5 mb-3">
+                                    <label class="form-label fw-semibold text-muted">Fuerza:</label>
+                                    <p class="mb-0">@Model.Force</p>
+                                </div>
+
+                                @if (!string.IsNullOrEmpty(Model.PhaseName))
+                                {
+                                    <div class="col-md-3 mb-3">
+                                        <label class="form-label fw-semibold text-muted">Fase Filtrada:</label>
+                                        <p class="mb-0">@Model.PhaseName</p>
+                                    </div>
+                                }
+
+                                <div class="col-md-2 mb-3">
+                                    <label class="form-label fw-semibold text-muted">Estado Programa:</label>
+                                    <p class="mb-0">
+                                        <span
+                                            class="badge @StudentStatus.GetStatusBadgeClass(Model.StudentStatus)">@Model.StudentStatusDisplay
+                                        </span>
+                                    </p>
+                                </div>
+
+                                @if (!string.IsNullOrEmpty(Model.PhaseName) && !string.IsNullOrEmpty(Model.PhaseStatus))
+                                {
+                                    <div class="col-md-2 mb-3">
+                                        <label class="form-label fw-semibold text-muted">Estado Fase:</label>
+                                        <p class="mb-0">
+                                            <span
+                                                class="badge @StudentStatus.GetStatusBadgeClass(Model.PhaseStatus)">@Model.PhaseStatus
+                                            </span>
+                                        </p>
+                                    </div>
+                                }
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Desempeño Académico -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h5 class="card-title mb-0 text-white">
+                        <i class="ti ti-chart-pie me-2"></i>Desempeño Académico
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3 align-items-stretch">
+                        <!-- Calificación A -->
+                        <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+                            <div class="card border-start border-success border-4 h-100">
+                                <div class="card-body text-center">
+                                    <div class="rounded-circle bg-light-success p-3 mx-auto mb-2"
+                                        style="width: 60px; height: 60px;">
+                                        <i class="ti ti-star fs-3 text-success"></i>
+                                    </div>
+                                    <h3 class="mb-1 text-success">@Model.GradeDistribution.GradeA</h3>
+                                    <h6 class="text-muted mb-0">Calificación A</h6>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Calificación B -->
+                        <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+                            <div class="card border-start border-info border-4 h-100">
+                                <div class="card-body text-center">
+                                    <div class="rounded-circle bg-light-info p-3 mx-auto mb-2"
+                                        style="width: 60px; height: 60px;">
+                                        <i class="ti ti-circle-check fs-3 text-info"></i>
+                                    </div>
+                                    <h3 class="mb-1 text-info">@Model.GradeDistribution.GradeB</h3>
+                                    <h6 class="text-muted mb-0">Calificación B</h6>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Calificación C -->
+                        <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+                            <div class="card border-start border-secondary border-4 h-100">
+                                <div class="card-body text-center">
+                                    <div class="rounded-circle bg-light-success p-3 mx-auto mb-2"
+                                        style="width: 60px; height: 60px;">
+                                        <i class="ti ti-alert-circle fs-3 text-success"></i>
+                                    </div>
+                                    <h3 class="mb-1 text-success">@Model.GradeDistribution.GradeC</h3>
+                                    <h6 class="text-muted mb-0">Calificación C</h6>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Calificación N -->
+                        <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+                            <div class="card border-start border-warning border-4 h-100">
+                                <div class="card-body text-center">
+                                    <div class="rounded-circle bg-light-warning p-3 mx-auto mb-2"
+                                        style="width: 60px; height: 60px;">
+                                        <i class="ti ti-x fs-3 text-warning"></i>
+                                    </div>
+                                    <h3 class="mb-1 text-warning">@Model.GradeDistribution.GradeN</h3>
+                                    <h6 class="text-muted mb-0">Calificación N</h6>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Calificación N ROJA -->
+                        <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+                            <div class="card border-start border-danger border-4 h-100">
+                                <div class="card-body text-center">
+                                    <div class="rounded-circle bg-light-danger p-3 mx-auto mb-2"
+                                        style="width: 60px; height: 60px;">
+                                        <i class="ti ti-alert-triangle fs-3 text-danger"></i>
+                                    </div>
+                                    <h3 class="mb-1 text-danger">@Model.GradeDistribution.GradeNR</h3>
+                                    <h6 class="text-muted mb-0">Calificación N ROJA</h6>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- PROMEDIO NOTAS -->
+                        <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+                            <div class="card border-start border-success border-4 h-100">
+                                <div class="card-body text-center">
+                                    <div class="rounded-circle bg-light-success p-3 mx-auto mb-2"
+                                        style="width: 60px; height: 60px;">
+                                        <i class="ti ti-star fs-3 text-success"></i>
+                                    </div>
+                                    <h3 class="mb-1 text-success">@Model.Average.ToString("0.00")</h3>
+                                    <h6 class="text-muted mb-0">Promedio Académico</h6>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Progreso del Programa -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h5 class="card-title mb-0 text-white">
+                        <i class="ti ti-progress me-2"></i>Progreso del Programa
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3 align-items-stretch">
+                        <!-- Horas de Vuelo -->
+                        <div class="col-lg-3 col-md-6 mb-3">
+                            <div class="card border-start border-primary border-4 h-100">
+                                <div class="card-body d-flex align-items-center">
+                                    <div class="d-flex align-items-center">
+                                        <div class="me-3">
+                                            <div class="rounded-circle bg-light-primary p-3">
+                                                <i class="ti ti-plane fs-5 text-primary"></i>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <h6 class="text-muted mb-1">Horas de Vuelo</h6>
+                                            <h3 class="mb-0">@Model.TotalFlightHours</h3>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Fase Actual -->
+                        <div class="col-lg-3 col-md-6 mb-3">
+                            <div class="card border-start border-success border-4 h-100">
+                                <div class="card-body">
+                                    <h6 class="text-muted mb-2">Fase Actual</h6>
+                                    @if (!string.IsNullOrEmpty(Model.CurrentPhase))
+                                    {
+                                        <p class="mb-1 fw-bold">@Model.CurrentPhase</p>
+                                        <small class="text-muted">
+                                            @Model.CurrentPhaseMissionsCompleted / @Model.CurrentPhaseTotalMissions misiones
+                                            (@Model.CurrentPhaseProgressPercentage.ToString("0.00")%)
+                                        </small>
+                                    }
+                                    else
+                                    {
+                                        <p class="mb-0 text-muted fst-italic">
+                                            @if (Model.StudentStatus == StudentStatus.CourseCompleted)
+                                            {
+                                                <span class="text-success fw-bold">Programa Completado</span>
+                                            }
+                                            else if (Model.StudentStatus == StudentStatus.Suspended)
+                                            {
+                                                <span class="text-danger fw-bold">Estudiante Suspendido</span>
+                                            }
+                                            else
+                                            {
+                                                <span>Sin fase asignada</span>
+                                            }
+                                        </p>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Misiones No Evaluables -->
+                        <div class="col-lg-3 col-md-6 mb-3">
+                            <div class="card border-start border-success border-4 h-100">
+                                <div class="card-body d-flex align-items-center">
+                                    <div class="d-flex align-items-center">
+                                        <div class="me-3">
+                                            <div class="rounded-circle bg-light-success p-3">
+                                                <i class="ti ti-notebook fs-5 text-success"></i>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <h6 class="text-muted mb-1">Misiones No Evaluables</h6>
+                                            <h3 class="mb-0">@Model.NonEvaluableMissionRecords</h3>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Fases Completadas -->
+                        <div class="col-lg-3 col-md-6 mb-3">
+                            <div class="card border-start border-success border-4 h-100">
+                                <div class="card-body d-flex align-items-center">
+                                    <div class="d-flex align-items-center">
+                                        <div class="me-3">
+                                            <div class="rounded-circle bg-light-success p-3">
+                                                <i class="ti ti-clipboard-check fs-5 text-success"></i>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <h6 class="text-muted mb-1">Fases Completadas</h6>
+                                            <h3 class="mb-0">@Model.PhasesCompleted</h3>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Progreso Total -->
+                        <div class="col-lg-6 col-md-6 mb-3">
+                            <div class="card border-start border-info border-4 h-100">
+                                <div class="card-body">
+                                    <h6 class="text-muted mb-2">Progreso Total del Programa</h6>
+                                    <p class="mb-1 fw-bold">@Model.TotalMissionsCompleted / @Model.TotalMissionsInCourse
+                                        misiones</p>
+                                    <div class="progress" style="height: 30px;">
+                                        <div class="progress-bar bg-info" role="progressbar"
+                                            style="width: @string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0}%", Model.TotalCourseProgressPercentage)"
+                                            aria-valuenow="@Model.TotalCourseProgressPercentage" aria-valuemin="0"
+                                            aria-valuemax="100">
+                                            @Model.TotalCourseProgressPercentage.ToString("0.00")%
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Misiones Insatisfactorias -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h5 class="card-title mb-0 text-white">
+                        <i class="ti ti-alert-circle me-2"></i>Misiones Insatisfactorias
+                    </h5>
+                </div>
+                <div class="card-body">
+                    @if (Model.UnsatisfactoryMissions.Any())
+                    {
+                        <div class="table-responsive">
+                            <table id="unsatisfactoryTable"
+                                class="datatablesAdvancedJQuery table table-striped table-bordered text-nowrap align-middle">
+                                <thead>
+                                    <tr>
+                                        <th>Fase</th>
+                                        <th>Misión</th>
+                                        <th>Tareas con N Roja</th>
+                                        <th>Fecha</th>
+                                        <th>Instructor</th>
+                                        <th>Aeronave</th>
+                                        <th>Observaciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var mission in Model.UnsatisfactoryMissions)
+                                    {
+                                        <tr>
+                                            <td>@mission.Phase</td>
+                                            <td>@mission.Mission</td>
+                                            <td>
+                                                @foreach (var item in mission.TasksWithNRed)
+                                                {
+                                                    @item
+                                                    <br />
+                                                }
+                                            </td>
+                                            <td>@mission.Date.ToString("dd/MM/yyyy")</td>
+                                            <td>@mission.InstructorGradeAndName</td>
+                                            <td>@mission.AircraftRegistration</td>
+                                            <td>@mission.Observations</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-success text-center" role="alert">
+                            <i class="ti ti-circle-check fs-2 mb-2"></i>
+                            <p class="mb-0 fw-bold">¡Excelente! No hay misiones insatisfactorias registradas.</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Comités Académicos -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h5 class="card-title mb-0 text-white">
+                        <i class="ti ti-users me-2"></i>Comités Académicos
+                    </h5>
+                </div>
+                <div class="card-body">
+                    @if (Model.AcademicCommittees.Any())
+                    {
+                        <div class="table-responsive">
+                            <table id="committeesTable"
+                                class="datatablesAdvancedJQuery table table-striped table-bordered text-nowrap align-middle">
+                                <thead>
+                                    <tr>
+                                        <th>Número de Acta</th>
+                                        <th>Fecha</th>
+                                        <th>Decisión</th>
+                                        <th>Observaciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var committee in Model.AcademicCommittees)
+                                    {
+                                        <tr>
+                                            <td>@committee.ActNumber</td>
+                                            <td>@committee.Date.ToString("dd/MM/yyyy")</td>
+                                            <td>
+                                                @if (committee.Decision == CommitteeDecisions.ContinueCourse)
+                                                {
+                                                    <span class="badge bg-success">@committee.Decision</span>
+                                                }
+                                                else if (committee.Decision == CommitteeDecisions.Suspendecourse)
+                                                {
+                                                    <span class="badge bg-danger">@committee.Decision</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-secondary">@committee.Decision</span>
+                                                }
+                                            </td>
+                                            <td>@committee.Observations</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-info text-center" role="alert">
+                            <i class="ti ti-info-circle fs-2 mb-2"></i>
+                            <p class="mb-0">El estudiante no ha sido convocado a comités académicos.</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mb-2">
+        <a href="@Url.Action("Index", "Report")" class="btn btn-outline-secondary">
+            <i class="ti ti-arrow-left me-1"></i>Volver
+        </a>
+    </div>
+</div>
+
+@section Styles {
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="~/assets/libs/datatables.net-bs5/css/dataTables.bootstrap5.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.dataTables.min.css">
+}
+
+@section Scripts {
+    <!-- DataTables JS -->
+    <script src="~/assets/libs/datatables.net/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.print.min.js"></script>
+    <script src="~/assets/js/datatable/datatable-advanced.init.js"></script>
+}

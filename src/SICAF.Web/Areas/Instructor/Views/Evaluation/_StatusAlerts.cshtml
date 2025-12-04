@@ -1,0 +1,57 @@
+@model EvaluationOverviewDto
+
+@{
+    string pendingCommittee = UserConstants.StudentStatus.PendingCommittee;
+    string courseCompleted = UserConstants.StudentStatus.CourseCompleted;
+}
+
+@if (Model.Status == pendingCommittee && Model.PendingCommittee != null)
+{
+    <div class="row mb-3">
+        <div class="col-12">
+            <div class="alert alert-warning border-warning shadow-sm">
+                <div class="d-flex align-items-start">
+                    <i class="ti ti-alert-triangle fs-2 me-3"></i>
+                    <div class="flex-grow-1">
+                        <h5 class="alert-heading mb-2">
+                            <strong>ESTUDIANTE EN COMITÉ</strong>
+                        </h5>
+                        <p class="mb-2">
+                            El estudiante está <strong>suspendido temporalmente</strong> y no puede ser evaluado
+                            hasta que el comité tome una decisión.
+                        </p>
+                        <hr class="my-2">
+                        <p class="mb-1"><strong>Razón:</strong> @Model.PendingCommittee.Reason</p>
+                        <p class="mb-1">
+                            <strong>Comité Nº:</strong>
+                            <span class="badge bg-danger">@Model.PendingCommittee.CommitteeNumber</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+
+@if (Model.Status == courseCompleted)
+{
+    <div class="row mb-3">
+        <div class="col-12">
+            <div class="alert alert-success border-success shadow-sm">
+                <div class="d-flex align-items-start">
+                    <i class="ti ti-trophy fs-2 me-3 text-success"></i>
+                    <div class="flex-grow-1">
+                        <h5 class="alert-heading mb-2">
+                            <strong>PROGRAMA COMPLETADO EXITOSAMENTE!</strong>
+                        </h5>
+                        <p class="mb-2">
+                            El estudiante ha completado <strong>todas las fases del programa</strong>
+                            y ha obtenido su aprobación final.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}

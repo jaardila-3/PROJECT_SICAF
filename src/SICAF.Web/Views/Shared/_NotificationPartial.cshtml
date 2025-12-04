@@ -1,0 +1,110 @@
+@using SICAF.Common.Constants
+@{
+    var hasNotifications = TempData.ContainsKey(NotificationConstants.Success) ||
+                          TempData.ContainsKey(NotificationConstants.Error) ||
+                          TempData.ContainsKey(NotificationConstants.Warning) ||
+                          TempData.ContainsKey(NotificationConstants.Info) ||
+                          TempData.ContainsKey(NotificationConstants.ForcePasswordChange);
+}
+
+@if (hasNotifications)
+{
+    <script type="text/javascript">
+        // Función para mostrar notificaciones SweetAlert2
+        (function() {
+            'use strict';
+            
+            function initNotifications() {
+                if (typeof Swal === 'undefined') {
+                    console.error('SweetAlert2 no está cargado');
+                    return;
+                }
+                
+                @if (TempData[NotificationConstants.Success] != null)
+                {
+                    <text>
+                    Swal.fire({
+                        icon: 'success',
+                        title: '@NotificationConstants.Titles.Success',
+                        text: '@Html.Raw(TempData[NotificationConstants.Success]?.ToString()?.Replace("'", "\\'"))',
+                        confirmButtonText: '@NotificationConstants.Buttons.Understood',
+                        confirmButtonColor: '@NotificationConstants.Colors.Success',
+                        timer: @NotificationConstants.TimerDuration.Normal
+                    });
+                    </text>
+                }
+                
+                @if (TempData[NotificationConstants.Error] != null)
+                {
+                    <text>
+                    Swal.fire({
+                        icon: 'error',
+                        title: '@NotificationConstants.Titles.Error',
+                        text: '@Html.Raw(TempData[NotificationConstants.Error]?.ToString()?.Replace("'", "\\'"))',
+                        confirmButtonText: '@NotificationConstants.Buttons.Understood',
+                        confirmButtonColor: '@NotificationConstants.Colors.Error'
+                    });
+                    </text>
+                }
+                
+                @if (TempData[NotificationConstants.Warning] != null)
+                {
+                    <text>
+                    Swal.fire({
+                        icon: 'warning',
+                        title: '@NotificationConstants.Titles.Warning',
+                        text: '@Html.Raw(TempData[NotificationConstants.Warning]?.ToString()?.Replace("'", "\\'"))',
+                        confirmButtonText: '@NotificationConstants.Buttons.Understood',
+                        confirmButtonColor: '@NotificationConstants.Colors.Warning',
+                        timer: @NotificationConstants.TimerDuration.Slow
+                    });
+                    </text>
+                }
+                
+                @if (TempData[NotificationConstants.Info] != null)
+                {
+                    <text>
+                    Swal.fire({
+                        icon: 'info',
+                        title: '@NotificationConstants.Titles.Info',
+                        text: '@Html.Raw(TempData[NotificationConstants.Info]?.ToString()?.Replace("'", "\\'"))',
+                        confirmButtonText: '@NotificationConstants.Buttons.Understood',
+                        confirmButtonColor: '@NotificationConstants.Colors.Info',
+                        timer: @NotificationConstants.TimerDuration.Normal
+                    });
+                    </text>
+                }  
+
+                @if (TempData[NotificationConstants.ForcePasswordChange] != null)
+                {
+                    <text>
+                    Swal.fire({
+                        icon: 'warning',
+                        title: '@NotificationConstants.Titles.Warning',
+                        text: '@Html.Raw(TempData[NotificationConstants.ForcePasswordChange]?.ToString()?.Replace("'", "\\'"))',
+                        confirmButtonText: '@NotificationConstants.Buttons.Understood',
+                        confirmButtonColor: '@NotificationConstants.Colors.Success',
+                        showCancelButton: true,
+                        cancelButtonText: '@NotificationConstants.Buttons.Cancel',
+                        cancelButtonColor: '@NotificationConstants.Colors.Error',
+                    })
+                    .then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = '@Url.Action("ChangePassword", "User", new { area = "Identity" })';
+                        }
+                    });
+                    </text>
+                }                
+                
+            }
+            
+            // Ejecutar cuando el DOM esté listo
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', initNotifications);
+            } else {
+                // DOM ya está cargado
+                initNotifications();
+            }
+        })();
+    </script>
+}

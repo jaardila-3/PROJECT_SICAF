@@ -1,0 +1,46 @@
+@model InstructorFlightHoursDetailDto
+
+<div class="card">
+    <div class="card-header bg-primary text-white">
+        <h5 class="card-title mb-0 text-white">
+            <i class="ti ti-user-check me-2"></i>Registros de Vuelo
+        </h5>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table id="detailTable"
+                class="datatablesAdvancedJQuery table table-striped table-bordered text-nowrap align-middle">
+                <thead>
+                    <tr>
+                        <th class="text-center">No.</th>
+                        <th>Estudiante</th>
+                        <th>Misión/Fase</th>
+                        <th class="text-center">Aeronave</th>
+                        <th class="text-center">Horas de Vuelo</th>
+                        <th class="text-center">Fecha</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var record in Model.Records)
+                    {
+                        <tr>
+                            <td class="text-center">@record.Number</td>
+                            <td>@record.StudentName</td>
+                            <td>@record.MissionPhaseName</td>
+                            <td class="text-center">@record.AircraftRegistration</td>
+                            <td class="text-center">@record.FlightHours.ToString("0.00")</td>
+                            <td class="text-center">@record.FlightDate.ToString("dd/MM/yyyy")</td>
+                        </tr>
+                    }
+                </tbody>
+                <tfoot>
+                    <tr class="table-secondary fw-bold">
+                        <td colspan="4" class="text-end">Total Horas:</td>
+                        <td class="text-center">@Model.TotalHours.ToString("0.00")</td>
+                        <td></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+</div>

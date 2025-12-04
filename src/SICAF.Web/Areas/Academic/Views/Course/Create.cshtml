@@ -1,0 +1,150 @@
+@model CreateCourseDto
+@using SICAF.Common.DTOs.Academic
+
+@{
+    ViewData["Title"] = "Crear Programa";
+}
+
+<nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb rounded">
+        <li class="breadcrumb-item">
+            <a href="@Url.Action("Index", "Home", new { area = "" })" class="text-success d-flex align-items-center">
+                <i class="ti ti-home fs-4 mt-1"></i>
+            </a>
+        </li>
+        <li class="breadcrumb-item">
+            <a href="@Url.Action("Index", "Course")" class="text-success">Programas</a>
+        </li>
+        <li class="breadcrumb-item text-success active" aria-current="page">Crear</li>
+    </ol>
+</nav>
+
+<div class="col-lg-8 mx-auto">
+    <div class="card">
+        <div class="card-header bg-success text-white">
+            <h4 class="card-title mb-0 text-white">
+                <i class="ti ti-school me-2"></i>Crear Nuevo Programa
+            </h4>
+        </div>
+
+        <form asp-action="Create" method="post" class="needs-validation" novalidate>
+            <div asp-validation-summary="ModelOnly" class="text-danger text-center mt-2" role="alert"></div>
+
+            <div class="card-body p-4">
+                <div class="row">
+                    <!-- Número del Programa -->
+                    <div class="col-md-6 mb-4">
+                        <label asp-for="CourseNumber" class="form-label"></label>
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <i class="ti ti-hash"></i>
+                            </span>
+                            <input asp-for="CourseNumber" class="form-control" type="number" min="1" max="999"
+                                placeholder="001" required>
+                        </div>
+                        <span asp-validation-for="CourseNumber" class="text-danger"></span>
+                        <small class="form-text text-muted">Número único de 1 a 999</small>
+                    </div>
+
+                    <!-- Nombre del Programa -->
+                    <div class="col-md-6 mb-4">
+                        <label asp-for="CourseName" class="form-label"></label>
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <i class="ti ti-book"></i>
+                            </span>
+                            <input asp-for="CourseName" class="form-control" placeholder="Programa de Aviación"
+                                required>
+                        </div>
+                        <span asp-validation-for="CourseName" class="text-danger"></span>
+                    </div>
+
+                    <!-- Descripción -->
+                    <div class="col-12 mb-4">
+                        <label asp-for="Description" class="form-label"></label>
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <i class="ti ti-file-text"></i>
+                            </span>
+                            <textarea asp-for="Description" class="form-control" rows="3"
+                                placeholder="Descripción del Programa..." required></textarea>
+                        </div>
+                        <span asp-validation-for="Description" class="text-danger"></span>
+                    </div>
+
+                    <!-- Fecha de Inicio -->
+                    <div class="col-md-6 mb-4">
+                        <label asp-for="StartDateString" class="form-label"></label>
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <i class="ti ti-calendar-event"></i>
+                            </span>
+                            <input asp-for="StartDateString" type="date" class="form-control" required>
+                        </div>
+                        <span asp-validation-for="StartDateString" class="text-danger"></span>
+                    </div>
+
+                    <!-- Fecha de Finalización -->
+                    <div class="col-md-6 mb-4">
+                        <label asp-for="EndDateString" class="form-label"></label>
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <i class="ti ti-calendar-check"></i>
+                            </span>
+                            <input asp-for="EndDateString" type="date" class="form-control" required>
+                        </div>
+                        <span asp-validation-for="EndDateString" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <!-- Nota informativa -->
+                <div class="alert alert-info" role="alert">
+                    <i class="ti ti-info-circle me-2"></i>
+                    <strong>Nota:</strong> Una vez creado, el programa no podrá ser eliminado ni modificado.
+                    Solo se podrá actualizar la fecha de finalización.
+                </div>
+            </div>
+
+            <div class="card-footer bg-light">
+                <div class="d-flex justify-content-between">
+                    <a asp-action="Index" class="btn btn-secondary">
+                        <i class="ti ti-arrow-left me-2"></i>Cancelar
+                    </a>
+                    <button type="submit" class="btn btn-success">
+                        <i class="ti ti-device-floppy me-2"></i>Guardar Programa
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <!-- Bootstrap validation -->
+    <script src="~/assets/js/plugins/bootstrap-validation-init.js"></script>
+
+    <script type="text/javascript">
+        document.addEventListener('DOMContentLoaded', function () {
+            // Validar que la fecha fin sea mayor que la fecha inicio
+            const startDate = document.getElementById('StartDateString');
+            const endDate = document.getElementById('EndDateString');
+
+            function validateDates() {
+                if (startDate.value && endDate.value) {
+                    if (endDate.value <= startDate.value) {
+                        endDate.setCustomValidity('La fecha de finalización debe ser posterior a la fecha de inicio');
+                    } else {
+                        endDate.setCustomValidity('');
+                    }
+                }
+            }
+
+            startDate.addEventListener('change', validateDates);
+            endDate.addEventListener('change', validateDates);
+        });
+    </script>
+}

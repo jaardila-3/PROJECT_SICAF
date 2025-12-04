@@ -1,0 +1,516 @@
+@model MissionGradesEditViewDto
+@{
+    ViewData["Title"] = $"Editar Calificaciones - Misión {Model.MissionNumber}";
+    string gradeA = GradeConstants.GradeTypes.A;
+    string gradeB = GradeConstants.GradeTypes.B;
+    string gradeC = GradeConstants.GradeTypes.C;
+    string gradeN = GradeConstants.GradeTypes.N;
+    string gradeDM = GradeConstants.GradeTypes.DM;
+    string gradeSC = GradeConstants.GradeTypes.SC;
+    string gradeNR = GradeConstants.GradeTypes.NR;
+    string mentalFactor = GradeConstants.NRedCategories.Mental;
+    string physicalFactor = GradeConstants.NRedCategories.Physical;
+    string emotionalFactor = GradeConstants.NRedCategories.Emotional;
+    string studentIdentificationName = $"{Model.StudentFullIdentification} - {Model.StudentFullName}";
+    string viewType = ViewBag.ViewType;
+    List<TaskGradeEditDto>? tasks = Model.TaskGrades.OrderByDescending(t => t.IsP3).ThenBy(t => t.TaskName).ToList();
+}
+
+<nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb rounded">
+        <li class="breadcrumb-item">
+            <a href="@Url.Action("Index", "Home", new { area = "" })" class="text-success d-flex align-items-center">
+                <i class="ti ti-home fs-4 mt-1"></i>
+            </a>
+        </li>
+        <li class="breadcrumb-item">
+            <a href="@Url.Action("Index", "Course", new { area = "Academic" })" class="text-success">Programas</a>
+        </li>
+        <li class="breadcrumb-item">
+            <a href="@Url.Action("Details", "Course", new { area = "Academic", id = Model.CourseId })"
+                class="text-success">Detalles</a>
+        </li>
+        <li class="breadcrumb-item">
+            <a href="@Url.Action("EvaluateStudent", "Evaluation", new { area = "Instructor", studentId = Model.StudentId, courseId = Model.CourseId })"
+                class="text-success">Evaluar</a>
+        </li>
+        <li class="breadcrumb-item text-success active" aria-current="page">Editar Misión @Model.MissionNumber</li>
+    </ol>
+</nav>
+
+<div class="container-fluid">
+    <!-- Información de la Misión y Estudiante -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5 class="text-primary mb-3">
+                                <i class="ti ti-plane me-2"></i>@Model.MissionName
+                            </h5>
+                            <p class="mb-1">
+                                <strong>Estudiante:</strong> @Model.StudentFullName
+                            </p>
+                            <p class="mb-1">
+                                <strong>Fecha de Evaluación:</strong> @Model.EvaluationDate.ToString("dd/MM/yyyy")
+                            </p>
+                        </div>
+                        @if (viewType != AviationConstants.NonEvaluableMission)
+                        {
+                            <div class="col-md-4 text-md-end mt-3">
+                                @if (Model.IsMissionCurrentlyFailed)
+                                {
+                                    <span class="badge bg-danger fs-5">
+                                        <i class="ti ti-alert-triangle me-1"></i>
+                                        Misión Insatisfactoria
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-success fs-5">
+                                        <i class="ti ti-check-circle me-1"></i>
+                                        Misión Satisfactoria
+                                    </span>
+                                }
+                            </div>
+                        }
+                    </div>
+
+                    @if (viewType != AviationConstants.NonEvaluableMission)
+                    {
+                        <!-- Advertencias de Comité/Suspensión -->
+                        <div class="row mt-3">
+                            <div class="col-12">
+                                <div class="alert alert-warning">
+                                    <i class="ti ti-info-circle me-2"></i>
+                                    <strong>Importante:</strong>
+                                    <ul class="mb-0 mt-2">
+                                        <li>No se puede editar calificaciones <strong>N o N-Roja.</strong></li>
+                                        <li>Cada tarea puede editarse un <strong>máximo de 2 veces.</strong></li>
+                                        <li>Si cambia una calificación a N-Roja y la misión pasa a fallida, podría enviar al
+                                            estudiante a comité o suspensión.</li>
+                                        <li>Insatisfactorias en las últimas 5 misiones:
+                                            <strong>@Model.CurrentFailedMissionsInWindow</strong>
+                                        </li>
+                                        <li>Total misiones fallidas en el Programa:
+                                            <strong>@Model.CurrentTotalFailedMissions</strong>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Formulario de Edición -->
+    <form asp-action="SaveMissionGradesEdit" method="post" id="editGradesForm" class="needs-validation" novalidate>
+        <input type="hidden" name="MissionId" value="@Model.MissionId" />
+        <input type="hidden" name="StudentId" value="@Model.StudentId" />
+        <input type="hidden" name="CourseId" value="@Model.CourseId" />
+        <input type="hidden" name="InstructorId" value="@Model.EvaluatorInstructorId" />
+        <input type="hidden" name="StudentIdentificationName" value="@studentIdentificationName" />
+        <input type="hidden" name="ViewType" value="@viewType" />
+
+        <!-- Lista de Tareas -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="mb-4">
+                            <i class="ti ti-list-check me-2"></i>
+                            Tareas de la Misión (@tasks.Count)
+                        </h5>
+
+                        @for (var i = 0; i < tasks.Count; i++)
+                        {
+                            var task = tasks[i];
+                            var taskContainerId = $"task-container-{i}";
+
+                            <div class="task-edit-card p-3 mb-3 @(task.CanEdit ? "" : "bg-light")" id="@taskContainerId"
+                                data-task-index="@i">
+                                <input type="hidden" name="TaskGrades[@i].TaskGradeId" value="@task.TaskGradeId" />
+                                <input type="hidden" name="TaskGrades[@i].TaskId" value="@task.TaskId" />
+                                <input type="hidden" name="TaskGrades[@i].OldGrade" value="@task.CurrentGrade" />
+                                <input type="hidden" name="TaskGrades[@i].IsP3" value="@task.IsP3.ToString().ToLower()" />
+                                <input type="hidden" name="TaskGrades[@i].CanEdit"
+                                    value="@task.CanEdit.ToString().ToLower()" />
+
+                                <div class="row align-items-center">
+                                    <div class="col-md-5">
+                                        <h6 class="mb-1">
+                                            @if (task.IsP3)
+                                            {
+                                                <span class="badge bg-danger ms-2">P3</span>
+                                            }
+                                        </h6>
+                                        <p class="mb-1 small text-muted">@task.TaskName</p>
+                                        <p class="mb-0 small">
+                                            <strong>Nota Actual:</strong>
+                                            <span
+                                                class="badge @(task.CurrentGrade == gradeNR ? "bg-danger" : "bg-success")">
+                                                @task.CurrentGrade
+                                            </span>
+                                        </p>
+                                        @if (task.EditCount > 0)
+                                        {
+                                            <p class="mb-0 small text-muted"><i class="ti ti-edit me-1"></i>
+                                                Editada @task.EditCount @(task.EditCount == 1 ? "vez" : "veces")
+                                            </p>
+                                        }
+                                    </div>
+
+                                    <div class="col-md-7">
+                                        @if (task.CanEdit)
+                                        {
+                                            <div class="grade-buttons btn-group w-100" role="group">
+                                                <input type="radio" class="btn-check edit-task-grade"
+                                                    name="TaskGrades[@i].NewGrade" id="task_@(i)_A" value="@gradeA"
+                                                    checked="@(task.CurrentGrade == gradeA ? "checked" : null)"
+                                                    data-task-index="@i" data-task-id="@task.TaskId"
+                                                    data-task-name="@task.TaskName" data-is-p3="@task.IsP3" />
+                                                <label class="btn btn-outline-success" for="task_@(i)_A">@gradeA</label>
+
+                                                <input type="radio" class="btn-check edit-task-grade"
+                                                    name="TaskGrades[@i].NewGrade" id="task_@(i)_B" value="@gradeB"
+                                                    checked="@(task.CurrentGrade == gradeB ? "checked" : null)"
+                                                    data-task-index="@i" data-task-id="@task.TaskId"
+                                                    data-task-name="@task.TaskName" data-is-p3="@task.IsP3" />
+                                                <label class="btn btn-outline-success" for="task_@(i)_B">@gradeB</label>
+
+                                                <input type="radio" class="btn-check edit-task-grade"
+                                                    name="TaskGrades[@i].NewGrade" id="task_@(i)_C" value="@gradeC"
+                                                    checked="@(task.CurrentGrade == gradeC ? "checked" : null)"
+                                                    data-task-index="@i" data-task-id="@task.TaskId"
+                                                    data-task-name="@task.TaskName" data-is-p3="@task.IsP3" />
+                                                <label class="btn btn-outline-success" for="task_@(i)_C">@gradeC</label>
+
+                                                @if (!task.IsP3)
+                                                {
+                                                    <input type="radio" class="btn-check edit-task-grade"
+                                                        name="TaskGrades[@i].NewGrade" id="task_@(i)_N" value="@gradeN"
+                                                        checked="@(task.CurrentGrade == gradeN ? "checked" : null)"
+                                                        data-task-index="@i" data-task-id="@task.TaskId"
+                                                        data-task-name="@task.TaskName" data-is-p3="@task.IsP3" />
+                                                    <label class="btn btn-outline-success" for="task_@(i)_N">@gradeN</label>
+                                                }
+
+                                                <input type="radio" class="btn-check edit-task-grade"
+                                                    name="TaskGrades[@i].NewGrade" id="task_@(i)_DM" value="@gradeDM"
+                                                    checked="@(task.CurrentGrade == gradeDM ? "checked" : null)"
+                                                    data-task-index="@i" data-task-id="@task.TaskId"
+                                                    data-task-name="@task.TaskName" data-is-p3="@task.IsP3" />
+                                                <label class="btn btn-outline-info" for="task_@(i)_DM">@gradeDM</label>
+
+                                                <input type="radio" class="btn-check edit-task-grade"
+                                                    name="TaskGrades[@i].NewGrade" id="task_@(i)_SC" value="@gradeSC"
+                                                    checked="@(task.CurrentGrade == gradeSC ? "checked" : null)"
+                                                    data-task-index="@i" data-task-id="@task.TaskId"
+                                                    data-task-name="@task.TaskName" data-is-p3="@task.IsP3" />
+                                                <label class="btn btn-outline-secondary" for="task_@(i)_SC">/</label>
+
+                                                @if (task.IsP3)
+                                                {
+                                                    <input type="radio" class="btn-check edit-task-grade"
+                                                        name="TaskGrades[@i].NewGrade" id="task_@(i)_NR" value="@gradeNR"
+                                                        checked="@(task.CurrentGrade == gradeNR ? "checked" : null)"
+                                                        data-task-index="@i" data-task-id="@task.TaskId"
+                                                        data-task-name="@task.TaskName" data-is-p3="@task.IsP3" />
+                                                    <label class="btn btn-outline-danger" for="task_@(i)_NR">@gradeNR</label>
+                                                }
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <div class="alert alert-secondary mb-0">
+                                                <i class="ti ti-lock me-2"></i>
+                                                <strong>No editable:</strong> @task.ReasonCannotEdit
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+
+                                <!-- Razones de N-Roja actuales (si existen) -->
+                                @if (task.CurrentNRedReasons.Any())
+                                {
+                                    <div class="row mt-2">
+                                        <div class="col-12">
+                                            <div class="alert alert-warning mb-0">
+                                                <strong><i class="ti ti-alert-triangle me-1"></i>Motivos:</strong>
+                                                <ul class="mb-0 mt-2">
+                                                    @foreach (var reason in task.CurrentNRedReasons)
+                                                    {
+                                                        <li><strong>@reason.ReasonCategory:</strong> @reason.ReasonDescription</li>
+                                                    }
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+
+                                <!-- Contenedor para razones de N-Roja (se llenará con JS) -->
+                                <div class="nred-reasons-container mt-2" style="display: none;" data-task-index="@i"></div>
+                            </div>
+                        }
+
+                        <!-- Observaciones Generales -->
+                        <div class="my-4">
+                            <div class="form-group">
+                                <label for="GeneralObservations" class="form-label">
+                                    <i class="ti ti-message-2 me-1"></i>Observaciones Generales de la Misión
+                                </label>
+                                <textarea class="form-control" name="GeneralObservations" id="GeneralObservations"
+                                    rows="4" maxlength="2000" required>@Model.GeneralObservations</textarea>
+                                <div class="invalid-feedback">Las observaciones son requeridas y no pueden tener menos
+                                    de 20 caracteres
+                                    o
+                                    superar los 2000 caracteres</div>
+                                <div class="d-flex justify-content-between align-items-center mt-1">
+                                    <small class="text-muted">
+                                        <span id="charCount">0</span> / 2000 caracteres
+                                        <span id="charRemaining" class="ms-2">(2000 restantes)</span>
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Botones de Acción -->
+        <div class="row mb-3">
+            <div class="col-12">
+                <div class="d-flex justify-content-between">
+                    <a href="@Url.Action("EvaluateStudent", new { studentId = Model.StudentId, courseId = Model.CourseId })"
+                        class="btn btn-light">
+                        <i class="ti ti-arrow-left me-1"></i>
+                        Cancelar
+                    </a>
+                    <button type="submit" class="btn btn-primary" id="btnSubmit">
+                        <i class="ti ti-device-floppy me-1"></i>
+                        Guardar Cambios
+                    </button>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <!-- Modal de Razones N-Roja (reutilizando el existente) -->
+    <div class="modal fade" id="modalNRedReasons" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title">
+                        <i class="ti ti-alert-triangle me-2"></i>
+                        Seleccionar Razones para Calificación No Satisfactoria
+                    </h5>
+                </div>
+                <div class="modal-body">
+                    <!-- Información de la tarea -->
+                    <div class="alert alert-light border mb-3">
+                        <h6 class="mb-2">
+                            <strong>Tarea:</strong>
+                            <span id="modalTaskName"></span>
+                        </h6>
+                    </div>
+
+                    <!-- Selección de categorías y razones -->
+                    <div class="mb-3">
+                        <p class="text-muted mb-3">
+                            <i class="ti ti-info-circle me-1"></i>
+                            Seleccione una o varias categorías y al menos una razón por cada categoría seleccionada.
+                        </p>
+
+                        <!-- Acordeón para las categorías -->
+                        <div class="accordion" id="accordionNRedCategories">
+                            <!-- Categoría Mental -->
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#collapseMental">
+                                        <i class="ti ti-brain me-2"></i>
+                                        Factor Mental
+                                    </button>
+                                </h2>
+                                <div id="collapseMental" class="accordion-collapse collapse"
+                                    data-bs-parent="#accordionNRedCategories">
+                                    <div class="accordion-body">
+                                        <div class="reasons-container" data-category="@mentalFactor">
+                                            <div class="d-flex justify-content-center">
+                                                <div class="spinner-border spinner-border-sm text-primary"
+                                                    role="status">
+                                                    <span class="visually-hidden">Cargando...</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Categoría Física -->
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#collapsePhysical">
+                                        <i class="ti ti-run me-2"></i>
+                                        Factor Físico
+                                    </button>
+                                </h2>
+                                <div id="collapsePhysical" class="accordion-collapse collapse"
+                                    data-bs-parent="#accordionNRedCategories">
+                                    <div class="accordion-body">
+                                        <div class="reasons-container" data-category="@physicalFactor">
+                                            <div class="d-flex justify-content-center">
+                                                <div class="spinner-border spinner-border-sm text-primary"
+                                                    role="status">
+                                                    <span class="visually-hidden">Cargando...</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Categoría Emocional -->
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#collapseEmotional">
+                                        <i class="ti ti-heart me-2"></i>
+                                        Factor Emocional
+                                    </button>
+                                </h2>
+                                <div id="collapseEmotional" class="accordion-collapse collapse"
+                                    data-bs-parent="#accordionNRedCategories">
+                                    <div class="accordion-body">
+                                        <div class="reasons-container" data-category="@emotionalFactor">
+                                            <div class="d-flex justify-content-center">
+                                                <div class="spinner-border spinner-border-sm text-primary"
+                                                    role="status">
+                                                    <span class="visually-hidden">Cargando...</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Mensaje de validación -->
+                    <div class="alert alert-danger d-none" id="modalValidationMessage">
+                        <i class="ti ti-alert-circle me-1"></i>
+                        <span id="modalValidationText"></span>
+                    </div>
+
+                    <!-- Campos ocultos para tracking -->
+                    <input type="hidden" id="modalTaskIndex" value="">
+                    <input type="hidden" id="modalTaskId" value="">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" id="btnCancelNRed">
+                        <i class="ti ti-x me-1"></i>
+                        Cancelar y Mantener Calificación Original
+                    </button>
+                    <button type="button" class="btn btn-primary" id="btnSaveNRed">
+                        <i class="ti ti-check me-1"></i>
+                        Guardar Razones
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+@section Styles {
+    <style>
+        .task-edit-card {
+            border: 1px solid #dee2e6;
+            border-radius: 0.375rem;
+            transition: all 0.3s ease;
+        }
+
+        .task-edit-card:hover {
+            box-shadow: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.1);
+        }
+
+        .grade-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.25rem;
+        }
+
+        .grade-buttons .btn {
+            flex: 1 1 auto;
+            min-width: 50px;
+            font-size: 0.875rem;
+            padding: 0.375rem 0.5rem;
+        }
+
+        /* En pantallas pequeñas, hacer los botones un poco más grandes */
+        @@media (max-width: 576px) {
+            .grade-buttons .btn {
+                min-width: 45px;
+                font-size: 0.8rem;
+                padding: 0.35rem 0.4rem;
+            }
+        }
+
+        /* En pantallas muy pequeñas, apilar los botones en 2 filas */
+        @@media (max-width: 400px) {
+            .grade-buttons .btn {
+                flex: 1 1 30%;
+            }
+        }
+    </style>
+}
+
+@section Scripts {
+    <script type="module">
+        import { initializeEditNRedModal } from '/js/Areas/Instructor/Evaluation/edit-nred-modal.js';
+        import { initializeEditGradesForm } from '/js/Areas/Instructor/Evaluation/edit-grades.js';
+
+        // Inicializar modal de N-Roja para edición
+        initializeEditNRedModal();
+
+        // Inicializar formulario de edición
+        initializeEditGradesForm(@Model.CurrentFailedMissionsInWindow, @Model.CurrentTotalFailedMissions, @Model.IsMissionCurrentlyFailed.ToString().ToLower());
+
+        // Contador de caracteres para observaciones
+        const textarea = document.getElementById('GeneralObservations');
+        const charCount = document.getElementById('charCount');
+        const charRemaining = document.getElementById('charRemaining');
+        const maxChars = 2000;
+
+        function updateCharCount() {
+            const currentLength = textarea.value.length;
+            const remaining = maxChars - currentLength;
+
+            charCount.textContent = currentLength;
+            charRemaining.textContent = `(${remaining} restantes)`;
+
+            // Cambiar color según el porcentaje usado
+            if (remaining < 100) {
+                charCount.className = 'text-danger fw-bold';
+                charRemaining.className = 'ms-2 text-danger fw-bold';
+            } else if (remaining < 300) {
+                charCount.className = 'text-warning fw-bold';
+                charRemaining.className = 'ms-2 text-warning fw-bold';
+            } else {
+                charCount.className = 'text-muted';
+                charRemaining.className = 'ms-2 text-muted';
+            }
+        }
+
+        // Actualizar contador al escribir
+        textarea.addEventListener('input', updateCharCount);
+
+        // Inicializar contador
+        updateCharCount();
+    </script>
+}

@@ -1,0 +1,315 @@
+/* ===================================
+   Police Green Theme
+   Tema Verde Policial/Militar
+   Aplicado al proyecto SICAF con Bootstrap 5
+   =================================== */
+
+/* Variables del tema personalizado */
+:root {
+    /* Colores - Verde Policial */
+    --ponal-primary: #2e7d32;
+    --ponal-primary-rgb: 46, 125, 50;
+    --ponal-primary-dark: #1b5e20;
+    --ponal-primary-light: #4caf50;
+    --ponal-secondary: #919691;
+    --ponal-accent: #8bc34a;
+    --ponal-dark-bg: #1a1f1a;
+
+    /* Override de variables de Bootstrap para el tema verde */
+    --bs-primary: var(--ponal-primary);
+    --bs-primary-rgb: var(--ponal-primary-rgb);
+    --bs-primary-bg-subtle: rgba(46, 125, 50, 0.1);
+    --bs-primary-border-subtle: rgba(46, 125, 50, 0.2);
+    --bs-primary-text-emphasis: var(--ponal-primary-dark);
+
+    --bs-secondary: var(--ponal-secondary);
+    --bs-secondary-rgb: 56, 142, 60;
+    --bs-secondary-bg-subtle: rgba(56, 142, 60, 0.1);
+
+    --bs-success: #367a3a;
+    --bs-success-rgb: 67, 160, 71;
+    --bs-info: #5a7c82;
+    --bs-warning: #8b7355;
+    --bs-danger: #c62828;
+}
+
+/* ==================== 
+   BODY
+   ==================== */
+
+body {
+    background-color: #eaf6d2;
+}
+
+/* ==================== 
+   BG COLOR
+   ==================== */
+
+.bg-secondary {
+    background-color: var(--ponal-secondary) !important;
+}
+
+.bg-info {
+    background-color: #008080 !important;
+}
+
+/* ==================== 
+   BOTONES
+   ==================== */
+
+/* Botón Primary */
+.btn-primary {
+    background: linear-gradient(135deg, var(--ponal-primary-dark) 0%, var(--ponal-primary) 60%, var(--ponal-primary-light) 100%);
+    border: 1px solid rgba(46, 125, 50, 0.5);
+    box-shadow: 0 4px 6px rgba(46, 125, 50, 0.3);
+    transition: all 0.3s ease;
+    font-weight: 600;
+    color: #ffffff !important;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #164a19 0%, #2e7d32 60%, #43a047 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(46, 125, 50, 0.4);
+    border-color: rgba(46, 125, 50, 0.6);
+    color: #ffffff !important;
+}
+
+.btn-primary:active,
+.btn-primary:focus {
+    background: linear-gradient(135deg, #164a19 0%, #2e7d32 60%, #43a047 100%);
+    box-shadow: 0 2px 4px rgba(46, 125, 50, 0.3) !important;
+    border-color: rgba(46, 125, 50, 0.7) !important;
+}
+
+/* Botón Success - Verde más claro */
+.btn-success {
+    background: linear-gradient(135deg, #388e3c 0%, #43a047 60%, #66bb6a 100%);
+    border: 1px solid rgba(67, 160, 71, 0.5);
+    box-shadow: 0 4px 6px rgba(67, 160, 71, 0.3);
+    transition: all 0.3s ease;
+    font-weight: 600;
+    color: #ffffff !important;
+}
+
+.btn-success:hover {
+    background: linear-gradient(135deg, #2e7d32 0%, #388e3c 60%, #4caf50 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(67, 160, 71, 0.4);
+    border-color: rgba(67, 160, 71, 0.6);
+    color: #ffffff !important;
+}
+
+.btn-success:active,
+.btn-success:focus {
+    background: linear-gradient(135deg, #2e7d32 0%, #388e3c 60%, #4caf50 100%);
+    box-shadow: 0 2px 4px rgba(67, 160, 71, 0.3) !important;
+    border-color: rgba(67, 160, 71, 0.7) !important;
+}
+
+/* Botón Secondary */
+.btn-secondary {
+    background: linear-gradient(135deg, #455a64 0%, #546e7a 60%, #607d8b 100%);
+    border: 1px solid rgba(84, 110, 122, 0.5);
+    box-shadow: 0 4px 6px rgba(84, 110, 122, 0.3);
+    transition: all 0.3s ease;
+    font-weight: 600;
+    color: #ffffff !important;
+}
+
+.btn-secondary:hover {
+    background: linear-gradient(135deg, #37474f 0%, #455a64 60%, #546e7a 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(84, 110, 122, 0.4);
+    border-color: rgba(84, 110, 122, 0.6);
+    color: #ffffff !important;
+}
+
+/* Botón Outline Primary */
+.btn-outline-primary {
+    color: var(--ponal-primary);
+    border-color: var(--ponal-primary);
+    background: transparent;
+    transition: all 0.3s ease;
+}
+
+.btn-outline-primary:hover {
+    background: var(--ponal-primary);
+    border-color: var(--ponal-primary);
+    color: #ffffff !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(46, 125, 50, 0.3);
+}
+
+/* Botón Outline Success */
+.btn-outline-success {
+    color: #43a047;
+    border-color: #43a047;
+    background: transparent;
+    transition: all 0.3s ease;
+}
+
+.btn-outline-success:hover {
+    background: #43a047;
+    border-color: #43a047;
+    color: #ffffff !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(67, 160, 71, 0.3);
+}
+
+/* ==================== 
+   TOPBAR/NAVBAR
+   ==================== */
+
+.topbar {
+    background: linear-gradient(135deg, #1e272e 0%, #263238 50%, #1a2818 100%);
+    background-image: url('/assets/images/backgrounds/fondo_verde_navbar.webp');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-blend-mode: overlay;
+    border-bottom: 2px solid rgba(46, 125, 50, 0.3);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+/* Iconos de tres puntos del navbar en pantallas pequeñas*/
+.topbar .navbar-toggler i,
+.topbar .navbar-toggler .ti {
+    color: rgba(255, 255, 255, 0.85) !important;
+}
+
+/* ==================== 
+   SIDEBAR
+   ==================== */
+
+.left-sidebar {
+    background: linear-gradient(135deg, #1a2818 0%, #263238 50%, #1e272e 100%);
+    background-image: url('/assets/images/backgrounds/fondo_verde_navbar.webp');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-blend-mode: overlay;
+    border-right: 2px solid rgba(46, 125, 50, 0.3);
+    box-shadow: 4px 0 10px rgba(0, 0, 0, 0.3);
+}
+
+/* Contenedor del scroll del sidebar */
+.left-sidebar .scroll-sidebar {
+    height: calc(100vh - 140px);
+    /* Ajuste para logo y profile */
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+/* ==================== 
+   MENÚ DEL SIDEBAR - COLORES Y ESTILOS
+   ==================== */
+
+/* Enlaces del menú */
+.sidebar-nav .sidebar-item .sidebar-link {
+    color: rgba(255, 255, 255, 0.85) !important;
+}
+
+.sidebar-nav .sidebar-item .sidebar-link:hover {
+    background: rgba(46, 125, 50, 0.2);
+    color: #fff !important;
+}
+
+.sidebar-nav .sidebar-item .sidebar-link.active,
+.sidebar-nav .sidebar-item.selected>.sidebar-link {
+    background: rgba(46, 125, 50, 0.3);
+    color: #fff !important;
+}
+
+/* Iconos del menú */
+.sidebar-nav .sidebar-item .sidebar-link i,
+.sidebar-nav .sidebar-item .sidebar-link .ti {
+    color: var(--ponal-primary-light) !important;
+}
+
+/* Títulos de sección */
+.sidebar-nav .nav-small-cap {
+    color: rgba(139, 195, 74, 0.7) !important;
+}
+
+/* ==================== 
+   MENÚS DESPLEGABLES
+   ==================== */
+
+/* Flechas del menú desplegable */
+.sidebar-nav .has-arrow::after {
+    border-color: rgba(255, 255, 255, 0.7);
+}
+
+/* Submenús */
+.sidebar-nav .first-level {
+    background: rgba(0, 0, 0, 0.2);
+    border-left: 2px solid var(--ponal-primary);
+}
+
+/* ==================== 
+   NAVBAR
+   ==================== */
+
+.topbar .navbar-nav .nav-link {
+    color: rgba(255, 255, 255, 0.85) !important;
+}
+
+.topbar .navbar-nav .nav-link:hover {
+    color: var(--ponal-accent) !important;
+}
+
+.topbar .navbar-nav .nav-link i {
+    color: rgba(255, 255, 255, 0.85) !important;
+}
+
+.nav-icon-hover-bg:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* ==================== 
+   MODO OSCURO
+   ==================== */
+
+[data-bs-theme="dark"] {
+    --bs-body-bg: #0f1510;
+    --bs-body-color: rgba(255, 255, 255, 0.87);
+    --bs-card-bg: #1a2118;
+    --bs-border-color: rgba(255, 255, 255, 0.12);
+}
+
+[data-bs-theme="dark"] .body-wrapper {
+    background-color: #0f1510;
+}
+
+[data-bs-theme="dark"] .card {
+    background: #1a2118;
+    border-color: rgba(46, 125, 50, 0.3);
+}
+
+/* ==================== 
+   SELECT2 CON INPUT-GROUP
+   ==================== */
+.select2-with-icon .select2-container {
+    flex: 1 1 auto;
+}
+
+/* ==================== 
+   FIXES ADICIONALES
+   ==================== */
+
+/* Fix para cards */
+.card {
+    background: #ffffff;
+    border: 1px solid rgba(46, 125, 50, 0.15);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+}
+
+/* Asegurar que los dropdowns funcionen */
+.collapse {
+    transition: height 0.35s ease;
+}
+
+.collapsing {
+    transition: height 0.35s ease;
+}

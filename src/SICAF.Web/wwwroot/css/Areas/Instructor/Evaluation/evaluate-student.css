@@ -1,0 +1,257 @@
+/* ==========================================
+   SICAF - Estilos de Evaluación de Estudiante
+   ========================================== */
+
+/* Tarjetas de Misión */
+.mission-card {
+    border-left: 4px solid #279741;
+    transition: all 0.3s ease;
+}
+
+.mission-card.completed {
+    transition: all 0.3s ease;
+}
+
+.mission-card.completed:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
+/* ==========================================
+   CARDS DE COMITÉ
+   ========================================== */
+
+.committee-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    height: 100%;
+}
+
+.committee-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.committee-card .card-header {
+    font-weight: 600;
+}
+
+.committee-card .card-body {
+    font-size: 0.9rem;
+}
+
+.committee-card .text-justify {
+    text-align: justify;
+    line-height: 1.4;
+}
+
+/* Tarjetas de Evaluación de Tareas */
+.task-evaluation-card {
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    background: #fff;
+    transition: box-shadow 0.3s ease;
+}
+
+.task-evaluation-card:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.task-regular {
+    border-left: 4px solid #28a745;
+}
+
+/* Botones de Calificación */
+.grade-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+}
+
+.grade-buttons .btn {
+    flex: 1 1 auto;
+    min-width: 50px;
+    font-size: 0.875rem;
+    padding: 0.375rem 0.5rem;
+}
+
+.grade-buttons .btn-check:checked+.btn {
+    font-weight: bold;
+}
+
+/* Tarjeta de Información del Estudiante */
+.student-info-card {
+    background: linear-gradient(135deg, #09372ab8 0%, #058b36 100%);
+    color: white;
+    border-radius: 15px;
+    padding: 25px;
+    margin-bottom: 25px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.student-info-card h3 {
+    font-weight: 600;
+}
+
+.student-info-card p {
+    margin-bottom: 0.5rem;
+}
+
+/* Progreso de Fase */
+.phase-progress {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    padding: 15px;
+}
+
+.phase-progress h5 {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+/* Formulario Deshabilitado */
+fieldset:disabled {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+fieldset:disabled .task-evaluation-card {
+    background-color: #f8f9fa;
+}
+
+/* Alertas con Bordes */
+.alert.border-warning,
+.alert.border-danger,
+.alert.border-success {
+    border-width: 2px;
+}
+
+.alert h5.alert-heading {
+    font-weight: 600;
+}
+
+/* Modal de Comité */
+.form-check {
+    transition: all 0.2s ease;
+}
+
+.form-check:has(.form-check-input:checked) {
+    background-color: #e7f3ff;
+    border-color: #115e23 !important;
+}
+
+.form-check:hover {
+    background-color: #f8f9fa;
+}
+
+.form-check .form-check-label {
+    cursor: pointer;
+}
+
+/* Badges de Estado */
+.badge.fs-6 {
+    font-size: 1rem !important;
+    padding: 0.5em 0.75em;
+}
+
+.student-info-card .badge {
+    font-size: 0.875rem;
+    padding: 0.35em 0.65em;
+}
+
+/* Botones de Acción Grandes */
+.btn-lg {
+    padding: 0.75rem 1.5rem;
+    font-size: 1.125rem;
+}
+
+/* Iconos Grandes */
+.fs-1 {
+    font-size: 3rem !important;
+}
+
+.fs-2 {
+    font-size: 2rem !important;
+}
+
+/* Tarjetas de Acción */
+.card.border-success:hover,
+.card.border-primary:hover,
+.card.border-warning:hover,
+.card.border-danger:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px);
+    transition: all 0.3s ease;
+}
+
+/* Razones N-Red */
+.nred-reasons {
+    padding: 10px;
+    background-color: #fff5f5;
+    border-radius: 6px;
+    border: 1px solid #fecaca;
+}
+
+.nred-reasons.d-none {
+    display: none !important;
+}
+
+/* Accordion */
+.accordion-button:not(.collapsed) {
+    background-color: #e7f1ff;
+    color: #0d6efd;
+}
+
+.accordion-button:focus {
+    box-shadow: none;
+    border-color: rgba(0, 0, 0, 0.125);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .student-info-card {
+        padding: 20px;
+    }
+
+    .phase-progress {
+        margin-top: 15px;
+    }
+
+    .task-evaluation-card .row {
+        flex-direction: column;
+    }
+
+    .grade-buttons .btn {
+        min-width: 45px;
+        font-size: 0.8rem;
+        padding: 0.35rem 0.4rem;
+    }
+}
+
+/* En pantallas muy pequeñas, apilar los botones en 2 filas */
+@media (max-width: 400px) {
+    .grade-buttons .btn {
+        flex: 1 1 30%;
+    }
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.alert {
+    animation: fadeIn 0.3s ease;
+}

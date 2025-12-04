@@ -1,0 +1,82 @@
+@model IEnumerable<RoleDto>
+
+@{
+    ViewData["Title"] = "Administración Roles";
+}
+
+<nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb rounded">
+        <li class="breadcrumb-item">
+            <a href="@Url.Action("Index", "Home", new { area = "" })" class="text-success d-flex align-items-center">
+                <i class="ti ti-home fs-4 mt-1"></i>
+            </a>
+        </li>
+        <li class="breadcrumb-item text-success active" aria-current="page">Roles</li>
+    </ol>
+</nav>
+
+<div class="">
+    <div class="row mb-3">
+        <div class="col-md-6 col-sm-12">
+            <h4 class="page-title text-truncate font-weight-medium mb-1">@ViewData["Title"]</h4>
+        </div>
+    </div>
+</div>
+
+<div class="">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Lista de Roles</h4>
+                    <h6 class="card-subtitle mb-3">Administración de roles del sistema</h6>
+
+                    <div class="table-responsive">
+                        <table id="rolesTable"
+                            class="datatablesJQuery table table-striped table-bordered text-nowrap align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Nombre</th>
+                                    <th>Descripción</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var role in Model)
+                                {
+                                    <tr>
+                                        <td>@role.Name</td>
+                                        <td>
+                                            @if (!string.IsNullOrEmpty(role.Description))
+                                            {
+                                                <span>@role.Description</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted fst-italic">Sin descripción</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            <div class="btn-group" role="group">
+                                                <a asp-action="Details" asp-route-id="@role.Id"
+                                                    class="btn btn-sm btn-success text-white" title="Ver detalles">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <!-- DataTables JS - Componente para tablas -->
+    <script src="~/assets/libs/datatables.net/js/jquery.dataTables.min.js"></script>
+    <script src="~/assets/js/datatable/datatable-basic.init.js"></script>
+}

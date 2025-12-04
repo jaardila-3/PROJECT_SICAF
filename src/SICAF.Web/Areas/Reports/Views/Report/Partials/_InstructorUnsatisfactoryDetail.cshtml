@@ -1,0 +1,50 @@
+@model InstructorUnsatisfactoryDetailDto
+
+<div class="card">
+    <div class="card-header bg-primary text-white">
+        <h5 class="card-title mb-0 text-white">
+            <i class="ti ti-user-exclamation me-2"></i>Misiones Insatisfactorias
+        </h5>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table id="detailTable" class="datatablesAdvancedJQuery table table-striped table-bordered text-nowrap align-middle">
+                <thead>
+                    <tr>
+                        <th class="text-center">No.</th>
+                        <th>Estudiante</th>
+                        <th>Misión/Fase</th>
+                        <th class="text-center">Fecha</th>
+                        <th class="text-center">Aeronave</th>
+                        <th class="text-center no-export">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var record in Model.Records)
+                    {
+                        <tr>
+                            <td class="text-center">@record.Number</td>
+                            <td>@record.StudentName</td>
+                            <td>@record.MissionPhaseName</td>
+                            <td class="text-center">@record.EvaluationDate.ToString("dd/MM/yyyy")</td>
+                            <td class="text-center">@record.InstructorOrAircraft</td>
+                            <td class="text-center">
+                                <a href="@Url.Action("MissionEvaluationDetail", "Student", new {
+                                    area = "Student",
+                                    missionId = record.MissionId,
+                                    studentId = record.StudentId,
+                                    courseId = record.CourseId,
+                                    returnUrl = "report"
+                                })"
+                                   target="_blank"
+                                   class="btn btn-sm btn-success">
+                                    <i class="ti ti-eye me-1"></i>Ver
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,110 @@
+﻿@{
+    ViewData["Title"] = "Inicio";
+}
+
+<!-- Vista Principal con Imagen de Fondo -->
+<div class="position-relative overflow-hidden" style="min-height: calc(100vh - 140px);">
+    <!-- Imagen de Fondo con Overlay -->
+    <div class="position-absolute top-0 start-0 w-100 h-100">
+        <img src="~/img/login/aeronaves.jpg" alt="Aviación Policial" class="img-fluid w-100 h-100"
+            style="object-fit: cover; object-position: center;">
+        <!-- Overlay oscuro para mejorar legibilidad -->
+        <div class="position-absolute top-0 start-0 w-100 h-100 bg-dark" style="opacity: 0.5;"></div>
+    </div>
+
+    <!-- Contenido sobre la imagen -->
+    <div class="position-relative d-flex align-items-center justify-content-center mt-5"
+        style="min-height: calc(100vh - 140px);">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-10 col-xl-8">
+                    <div class="card shadow-lg border-0" style="background: rgba(255, 255, 255, 0.95);">
+                        <div class="card-body p-5">
+                            <!-- Encabezado con logo -->
+                            <div class="text-center mb-4">
+                                <img src="~/assets/images/logos/dark-logo.svg" alt="SICAF Logo" class="mb-3"
+                                    style="max-height: 80px;">
+                                <h1 class="display-5 fw-bold text-success mb-3">
+                                    Sistema de Información para la Calificación de Fases de Vuelo
+                                </h1>
+                                <p class="lead text-muted">
+                                    Escuela de Aviación Policial - Policía Nacional de Colombia
+                                </p>
+                            </div>
+
+                            <hr class="my-4">
+
+                            <!-- Tarjetas de características -->
+                            <div class="row g-4 mt-2">
+                                <div class="col-md-4">
+                                    <div class="text-center p-3">
+                                        <h5 class="fw-semibold">Gestión Académica</h5>
+                                        <p class="text-muted mb-0">
+                                            Administración integral de programas, fases y misiones de vuelo
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <div class="text-center p-3">
+                                        <h5 class="fw-semibold">Evaluación de Desempeño</h5>
+                                        <p class="text-muted mb-0">
+                                            Sistema de calificación y seguimiento del progreso estudiantil
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <div class="text-center p-3">
+                                        <h5 class="fw-semibold">Análisis</h5>
+                                        <p class="text-muted mb-0">
+                                            Generación de estadísticas académicas
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Información adicional -->
+                            <div class="row mt-5">
+                                <div class="col-md-6">
+                                    <div class="d-flex align-items-start mb-3">
+                                        <i class="ti ti-check-circle text-success fs-5 me-2 mt-1"></i>
+                                        <div>
+                                            <h6 class="mb-1">Seguimiento en Tiempo Real</h6>
+                                            <small class="text-muted">Monitoreo continuo del progreso académico</small>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex align-items-start mb-3">
+                                        <i class="ti ti-check-circle text-success fs-5 me-2 mt-1"></i>
+                                        <div>
+                                            <h6 class="mb-1">Gestión de Instructores</h6>
+                                            <small class="text-muted">Asignación y coordinación de personal
+                                                docente</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="d-flex align-items-start mb-3">
+                                        <i class="ti ti-check-circle text-success fs-5 me-2 mt-1"></i>
+                                        <div>
+                                            <h6 class="mb-1">Control de Fases</h6>
+                                            <small class="text-muted">Administración detallada de fases de vuelo</small>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex align-items-start mb-3">
+                                        <i class="ti ti-check-circle text-success fs-5 me-2 mt-1"></i>
+                                        <div>
+                                            <h6 class="mb-1">Sistema de Auditoría</h6>
+                                            <small class="text-muted">Registro completo de todas las operaciones</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

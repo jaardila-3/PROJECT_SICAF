@@ -1,0 +1,187 @@
+@model ReportFilterDto
+
+@{
+    ViewData["Title"] = "Generador de Informes Académicos";
+}
+
+<nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb rounded">
+        <li class="breadcrumb-item">
+            <a href="@Url.Action("Index", "Home", new { area = "" })" class="text-success d-flex align-items-center">
+                <i class="ti ti-home fs-4 mt-1"></i>
+            </a>
+        </li>
+        <li class="breadcrumb-item text-success active" aria-current="page">Informes</li>
+    </ol>
+</nav>
+
+<div class="container-fluid">
+    <div class="row mb-3">
+        <div class="col-md-12 col-sm-12">
+            <h4 class="page-title text-truncate font-weight-medium mb-1">
+                <i class="ti ti-chart-bar me-2"></i>Generador de Informes Académicos
+            </h4>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h4 class="card-title mb-0 text-white">
+                        <i class="ti ti-filter me-2"></i>Filtros de Selección
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <p class="card-subtitle mb-4 text-muted">
+                        <i class="ti ti-info-circle me-1"></i>
+                        Seleccione los filtros para generar los informes académicos
+                    </p>
+
+                    <div class="row">
+                        <!-- Selector 1: programa (Obligatorio) -->
+                        <div class="col-md-6 mb-4">
+                            <label for="courseSelect" class="form-label fw-semibold">
+                                <i class="ti ti-book me-1 text-success"></i>1. Programa
+                                <span class="text-danger">*</span>
+                            </label>
+                            <div class="input-group select2-with-icon">
+                                <span class="input-group-text px-6">
+                                    <i class="ti ti-book fs-6"></i>
+                                </span>
+                                <select id="courseSelect" name="CourseId" asp-items="ViewBag.Courses"
+                                    class="form-select select2" required>
+                                    <option value="" disabled selected>Seleccione un programa...</option>
+                                </select>
+                            </div>
+                            <small class="form-text text-muted">Seleccione el programa para comenzar</small>
+                        </div>
+
+                        <!-- Selector 2: Fuerza (Opcional para informe general) -->
+                        <div class="col-md-6 mb-4">
+                            <label for="forceSelect" class="form-label fw-semibold">
+                                <i class="ti ti-military-rank me-1 text-success"></i>2. Fuerza
+                                <span class="text-muted">(Opcional)</span>
+                            </label>
+                            <div class="input-group select2-with-icon">
+                                <span class="input-group-text px-6">
+                                    <i class="ti ti-military-rank fs-6"></i>
+                                </span>
+                                <select id="forceSelect" name="Force" class="form-select select2" disabled>
+                                    <option value="" disabled selected>Seleccione una fuerza...</option>
+                                </select>
+                            </div>
+                            <small class="form-text text-muted">Opcional - filtra estudiantes por fuerza</small>
+                        </div>
+
+                        <!-- Selector 3: Tipo de Ala (Opcional para informe general) -->
+                        <div class="col-md-6 mb-4">
+                            <label for="wingTypeSelect" class="form-label fw-semibold">
+                                <i class="ti ti-propeller me-1 text-success"></i>3. Tipo de Ala
+                                <span class="text-muted">(Opcional)</span>
+                            </label>
+                            <div class="input-group select2-with-icon">
+                                <span class="input-group-text px-6">
+                                    <i class="ti ti-propeller fs-6"></i>
+                                </span>
+                                <select id="wingTypeSelect" name="WingType" class="form-select select2" disabled>
+                                    <option value="" disabled selected>Seleccione tipo de ala...</option>
+                                </select>
+                            </div>
+                            <small class="form-text text-muted">Opcional - filtra estudiantes por tipo de ala</small>
+                        </div>
+
+                        <!-- Selector 4: Fase (Opcional) -->
+                        <div class="col-md-6 mb-4">
+                            <label for="phaseSelect" class="form-label fw-semibold">
+                                <i class="ti ti-flag me-1 text-success"></i>4. Fase
+                                <span class="text-muted">(Opcional)</span>
+                            </label>
+                            <div class="input-group select2-with-icon">
+                                <span class="input-group-text px-6">
+                                    <i class="ti ti-flag fs-6"></i>
+                                </span>
+                                <select id="phaseSelect" name="PhaseId" class="form-select select2" disabled>
+                                    <option value="" disabled selected>Seleccione una fase...</option>
+                                </select>
+                            </div>
+                            <small class="form-text text-muted">Opcional - filtra estudiantes por fase</small>
+                        </div>
+
+                        <!-- Selector 5: Estudiante (Opcional - Se habilita al seleccionar programa) -->
+                        <div class="col-md-6 mb-4">
+                            <label for="studentSelect" class="form-label fw-semibold">
+                                <i class="ti ti-user me-1 text-info"></i>5. Estudiante
+                                <span class="text-muted">(Opcional)</span>
+                            </label>
+                            <div class="input-group select2-with-icon">
+                                <span class="input-group-text px-6">
+                                    <i class="ti ti-user fs-6"></i>
+                                </span>
+                                <select id="studentSelect" name="StudentId" class="form-select select2" disabled>
+                                    <option value="" disabled selected>Seleccione un estudiante...</option>
+                                </select>
+                            </div>
+                            <small class="form-text text-muted">Disponible al seleccionar programa</small>
+                        </div>
+                    </div>
+
+                    <hr class="my-4">
+
+                    <!-- Botones de Acción -->
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="d-flex flex-wrap gap-3 justify-content-center">
+                                <!-- Botón Informe General (Aparece al completar los 3 primeros filtros) -->
+                                <form asp-action="GeneralReport" method="post" id="generalReportForm"
+                                    style="display: none;">
+                                    <input type="hidden" id="generalCourseId" name="CourseId" />
+                                    <input type="hidden" id="generalForce" name="Force" />
+                                    <input type="hidden" id="generalWingType" name="WingType" />
+                                    <input type="hidden" id="generalPhaseId" name="PhaseId" />
+                                    <button type="submit" class="btn btn-primary btn-lg px-5 py-3">
+                                        <i class="ti ti-file-chart me-2"></i>Generar Informe General
+                                    </button>
+                                </form>
+
+                                <!-- Botón Informe Individual (Aparece al seleccionar estudiante) -->
+                                <form asp-action="IndividualReport" method="post" id="individualReportForm"
+                                    style="display: none;">
+                                    <input type="hidden" id="individualCourseId" name="CourseId" />
+                                    <input type="hidden" id="individualForce" name="Force" />
+                                    <input type="hidden" id="individualWingType" name="WingType" />
+                                    <input type="hidden" id="individualPhaseId" name="PhaseId" />
+                                    <input type="hidden" id="individualStudentId" name="StudentId" />
+                                    <button type="submit" class="btn btn-success btn-lg px-5 py-3">
+                                        <i class="ti ti-user-check me-2"></i>Generar Informe Individual
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Mensaje informativo cuando no hay filtros seleccionados -->
+                    <div id="noSelectionMessage" class="alert alert-info mt-4 text-center" role="alert">
+                        <i class="ti ti-info-circle me-2"></i>
+                        <strong>Complete los filtros necesarios para generar los informes</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <!-- Select2 CSS -->
+    <link rel="stylesheet" href="~/assets/libs/select2/dist/css/select2.min.css">
+}
+
+@section Scripts {
+    <!-- Select2 JS -->
+    <script src="~/assets/libs/select2/dist/js/select2.full.min.js"></script>
+    <script src="~/assets/libs/select2/dist/js/select2.min.js"></script>
+    <script src="~/assets/js/forms/select2.init.js"></script>
+
+    <!-- JavaScript para selectores en cascada -->
+    <script src="~/js/Areas/Reports/Report/report-filters.js"></script>
+}

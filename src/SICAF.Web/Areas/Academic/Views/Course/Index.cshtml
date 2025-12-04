@@ -1,0 +1,109 @@
+@model IEnumerable<CourseDto>
+@using SICAF.Common.DTOs.Academic
+
+@{
+    ViewData["Title"] = "Gestión de Programas";
+}
+
+<nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb rounded">
+        <li class="breadcrumb-item">
+            <a href="@Url.Action("Index", "Home", new { area = "" })" class="text-success d-flex align-items-center">
+                <i class="ti ti-home fs-4 mt-1"></i>
+            </a>
+        </li>
+        <li class="breadcrumb-item text-success active" aria-current="page">Programas</li>
+    </ol>
+</nav>
+
+<div class="">
+    <div class="row mb-3">
+        <div class="col-md-6 col-sm-12">
+            <h4 class="page-title text-truncate font-weight-medium mb-1">@ViewData["Title"]</h4>
+        </div>
+        <div class="col-lg-6 col-md-6 col-sm-12 align-self-center">
+            <div class="text-end">
+                @if (User.IsInRole(SystemRoles.ACADEMIC_ADMIN))
+                {
+                    <a asp-action="Create" class="btn btn-success text-white">
+                        <i class="ti ti-plus me-2"></i>Nuevo Programa
+                    </a>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Lista de Programas</h4>
+                    <h6 class="card-subtitle mb-3">Programas académicos del sistema</h6>
+
+                    <div class="table-responsive">
+                        <table id="courseTable"
+                            class="datatablesJQuery table table-striped table-bordered text-nowrap align-middle">
+                            <thead>
+                                <tr>
+                                    <th class="text-center">N°</th>
+                                    <th class="text-center">Nombre</th>
+                                    <th class="text-center">Fecha Inicio</th>
+                                    <th class="text-center">Fecha Fin</th>
+                                    <th class="text-center">Estado</th>
+                                    @if (User.IsInRole(SystemRoles.ACADEMIC_ADMIN))
+                                    {
+                                        <th class="text-center">Estudiantes</th>
+                                    }
+                                    <th class="text-center">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var course in Model)
+                                {
+                                    <tr>
+                                        <td class="text-center">
+                                            <span class="badge bg-dark">@course.CourseNumber</span>
+                                        </td>
+                                        <td class="text-center">@course.CourseName</td>
+                                        <td class="text-center" data-sort="@course.StartDate.ToString("yyyyMMdd")">
+                                            @course.StartDate.ToString("dd/MM/yyyy")
+                                        </td>
+                                        <td class="text-center" data-sort="@course.EndDate.ToString("yyyyMMdd")">
+                                            @course.EndDate.ToString("dd/MM/yyyy")
+                                        </td>
+                                        <td class="text-center">
+                                            <span class="badge @course.StatusBadgeClass">
+                                                @course.StatusCourse
+                                            </span>
+                                        </td>
+                                        @if (User.IsInRole(SystemRoles.ACADEMIC_ADMIN))
+                                        {
+                                            <td class="text-center">
+                                                <span class="badge bg-info">@course.ActiveStudentsCount</span>
+                                            </td>
+                                        }
+                                        <td class="text-center">
+                                            <div class="btn-group" role="group">
+                                                <a asp-action="Details" asp-route-id="@course.Id"
+                                                    class="btn btn-sm btn-primary text-white" title="Ver detalles"> Ver
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <!-- DataTables JS -->
+    <script src="~/assets/libs/datatables.net/js/jquery.dataTables.min.js"></script>
+    <script src="~/assets/js/datatable/datatable-basic.init.js"></script>
+}

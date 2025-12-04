@@ -1,0 +1,111 @@
+@model ChangeCourseDto
+@using SICAF.Common.DTOs.Academic
+
+@{
+    ViewData["Title"] = "Cambiar de programa";
+}
+
+<nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb rounded">
+        <li class="breadcrumb-item">
+            <a href="@Url.Action("Index", "Home", new { area = "" })" class="text-success d-flex align-items-center">
+                <i class="ti ti-home fs-4 mt-1"></i>
+            </a>
+        </li>
+        <li class="breadcrumb-item">
+            <a href="@Url.Action("Index", "Course")" class="text-success">Programas</a>
+        </li>
+        <li class="breadcrumb-item text-success active" aria-current="page">Cambiar de Programa</li>
+    </ol>
+</nav>
+
+<div class="col-lg-6 mx-auto">
+    <div class="card">
+        <div class="card-header bg-success">
+            <h4 class="card-title mb-0 text-white">
+                <i class="ti ti-switch-horizontal me-2"></i>Cambiar Estudiante de Programa
+            </h4>
+        </div>
+
+        <form asp-action="ChangeCourse" method="post" class="needs-validation" novalidate>
+            <div asp-validation-summary="ModelOnly" class="text-danger text-center mt-2" role="alert"></div>
+            <input type="hidden" asp-for="StudentId" />
+            <input type="hidden" asp-for="CurrentCourseId" />
+            <input type="hidden" asp-for="StudentIdentificationName" />
+            <input type="hidden" asp-for="CurrentCourseName" />
+
+            <div class="card-body p-4">
+                <!-- Información del Estudiante -->
+                <div class="alert alert-info mb-4" role="alert">
+                    <strong>Estudiante:</strong> @Model.StudentIdentificationName<br>
+                    <strong>Programa Actual:</strong> @Model.CurrentCourseName
+                </div>
+
+                <!-- Nuevo Programa -->
+                <div class="mb-4">
+                    <label asp-for="NewCourseId" class="form-label"></label>
+                    <div class="input-group select2-with-icon">
+                        <span class="input-group-text px-6">
+                            <i class="ti ti-school fs-6"></i>
+                        </span>
+                        <select asp-for="NewCourseId" asp-items="ViewBag.Courses" class="form-select select2" required>
+                            <option value="" disabled selected>Seleccione el nuevo Programa...</option>
+                        </select>
+                    </div>
+                    <span asp-validation-for="NewCourseId" class="text-danger"></span>
+                </div>
+
+                <!-- Motivo del Cambio -->
+                <div class="mb-4">
+                    <label asp-for="Reason" class="form-label"></label>
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            <i class="ti ti-file-text"></i>
+                        </span>
+                        <textarea asp-for="Reason" class="form-control" rows="3"
+                            placeholder="Explique el motivo del cambio..." required></textarea>
+                    </div>
+                    <span asp-validation-for="Reason" class="text-danger"></span>
+                </div>
+
+                <!-- Advertencia -->
+                <div class="alert alert-warning" role="alert">
+                    <i class="ti ti-alert-triangle me-2"></i>
+                    <strong>Importante:</strong> Esta acción desactivará la inscripción actual del estudiante
+                    y creará una nueva inscripción en el programa seleccionado. El cambio quedará registrado en el
+                    historial del estudiante.
+                </div>
+            </div>
+
+            <div class="card-footer bg-light">
+                <div class="d-flex justify-content-between">
+                    <a asp-action="Index" class="btn btn-secondary">
+                        <i class="ti ti-arrow-left me-2"></i>Cancelar
+                    </a>
+                    <button type="submit" class="btn btn-success">
+                        <i class="ti ti-switch-horizontal me-2"></i>Cambiar de Programa
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Styles {
+    <!-- Select2 CSS -->
+    <link rel="stylesheet" href="~/assets/libs/select2/dist/css/select2.min.css">
+}
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <!-- Bootstrap validation -->
+    <script src="~/assets/js/plugins/bootstrap-validation-init.js"></script>
+
+    <!-- Select2 JS -->
+    <script src="~/assets/libs/select2/dist/js/select2.full.min.js"></script>
+    <script src="~/assets/libs/select2/dist/js/select2.min.js"></script>
+    <script src="~/assets/js/forms/select2.init.js"></script>
+}

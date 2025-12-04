@@ -1,0 +1,77 @@
+@model CourseDto
+
+@{
+    ViewData["Title"] = "Detalles del Programa";
+}
+
+<nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb rounded">
+        <li class="breadcrumb-item">
+            <a href="@Url.Action("Index", "Home", new { area = "" })" class="text-success d-flex align-items-center">
+                <i class="ti ti-home fs-4 mt-1"></i>
+            </a>
+        </li>
+        <li class="breadcrumb-item">
+            <a href="@Url.Action("Index", "Course")" class="text-success">Programas</a>
+        </li>
+        <li class="breadcrumb-item text-success active" aria-current="page">Detalles</li>
+    </ol>
+</nav>
+
+<!-- Vistas contextuales según el rol del usuario -->
+@if (ViewBag.IsInstructorView == true)
+{
+    <partial name="_InstructorCourseView" model="Model" />
+}
+else if (ViewBag.IsStudentView == true)
+{
+    <partial name="_StudentCourseView" model="Model" />
+}
+else
+{
+    <partial name="_AdminCourseView" model="Model" />
+}
+
+<div class="mt-3">
+    <a asp-action="Index" class="btn btn-secondary mb-2">
+        <i class="ti ti-arrow-left me-2"></i>Volver al Listado
+    </a>
+</div>
+
+@section Styles {
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="~/assets/libs/datatables.net-bs5/css/dataTables.bootstrap5.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.dataTables.min.css">
+
+    <!-- DatePicker CSS - Componente de Flexy para fechas -->
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-material-datetimepicker/2.7.1/css/bootstrap-material-datetimepicker.min.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+    <!-- Estilos para mission-cards en vista de estudiante -->
+    <link rel="stylesheet" href="~/css/Areas/Instructor/Evaluation/evaluate-student.css">
+}
+
+@section Scripts {
+    <!-- DataTables JS -->
+    <script src="~/assets/libs/datatables.net/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.print.min.js"></script>
+    <script src="~/assets/js/datatable/datatable-advanced.init.js"></script>
+
+    <!-- DatePicker - Componente para fechas -->
+    <script src="~/assets/js/extra-libs/moment/moment.min.js"></script>
+    <script
+        src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-material-datetimepicker/2.7.1/js/bootstrap-material-datetimepicker.min.js">
+        </script>
+
+    <!-- Course details -->
+    <script src="~/js/Areas/Academic/Course/course-details.js"></script>
+    <!-- Course Instructors Management -->
+    <script src="~/js/Areas/Academic/Course/course-instructors.js"></script>
+
+}

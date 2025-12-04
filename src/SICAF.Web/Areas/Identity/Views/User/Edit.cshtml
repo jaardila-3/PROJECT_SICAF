@@ -1,0 +1,478 @@
+@model UpdateDto
+
+@{
+    ViewData["Title"] = "Editar Usuario";
+}
+
+<nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb rounded">
+        <li class="breadcrumb-item">
+            <a href="@Url.Action("Index", "Home", new { area = "" })" class="text-success d-flex align-items-center">
+                <i class="ti ti-home fs-4 mt-1"></i>
+            </a>
+        </li>
+        <li class="breadcrumb-item"><a href="@Url.Action("Index", "User")" class="text-success">Usuarios</a></li>
+        <li class="breadcrumb-item text-success active" aria-current="page">Editar</li>
+    </ol>
+</nav>
+
+<div class="col-lg-12">
+    <div class="card">
+        <div class="card-header bg-success text-white">
+            <h4 class="card-title mb-0 text-white">
+                Editar Usuario: @Model.Name @Model.LastName
+            </h4>
+        </div>
+
+        <form asp-action="Edit" method="post" enctype="multipart/form-data" class="needs-validation" novalidate
+            id="user-edit-form" data-is-locked-out='@Model.IsLockedOut.ToString().ToLower()'
+            data-has-aviation-profile='@(ViewBag.HasAviationProfile?.ToString().ToLower() ?? "false")'
+            data-current-roles='@Html.Raw(ViewBag.CurrentRoles ?? "[]")'
+            data-aviation-roles-json='["@SystemRoles.STUDENT", "@SystemRoles.INSTRUCTOR"]' data-pid='@Model.PID'
+            data-wing-type='@Model.WingType'>
+            <div asp-validation-summary="ModelOnly" class="text-danger text-center mt-2" role="alert"></div>
+            <div class="card-body p-4">
+                <input type="hidden" asp-for="Id" />
+                <div class="row">
+                    <div class="col-lg-4 border-end-lg pe-lg-4 mb-4 mb-lg-0">
+                        <div class="text-center">
+                            <h5 class="mb-3">Foto de Perfil</h5>
+
+                            <div id="photoPreview"
+                                class="mb-3 d-flex flex-column align-items-center justify-content-center">
+                                @if (Model.PhotoData != null && Model.PhotoData.Length > 0)
+                                {
+                                    <img src="@Model.PhotoBase64" alt="@Model.FullName" class="img-fluid rounded"
+                                        style="width: 100%; max-width: 150px; height: auto; aspect-ratio: 1/1; object-fit: cover;">
+                                }
+                                else
+                                {
+                                    <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center mx-auto"
+                                        style="width: 150px; height: 150px;">
+                                        <i class="ti ti-user fs-1 text-white"></i>
+                                    </div>
+                                }
+                            </div>
+
+                            <input type="file" name="photoFile" id="photoInput" class="d-none"
+                                accept="image/png, image/jpeg, image/bmp, image/webp" />
+
+                            <label for="photoInput" class="btn btn-outline-primary">
+                                <i class="ti ti-upload me-1"></i>
+                                Cambiar Imagen
+                            </label>
+
+                            <div class="form-text mt-2">
+                                La foto es opcional. Tamaño máx: 2MB. Formatos: JPG, PNG, BMP, WEBP. Dimensión máx:
+                                800x800
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-8 ps-lg-4">
+                        <div class="row">
+                            <div class="col-md-6 mb-4">
+                                <label asp-for="DocumentType" class="form-label"></label>
+                                <span class="text-danger">*</span>
+                                <div class="input-group select2-with-icon">
+                                    <span class="input-group-text px-6">
+                                        <i class="ti ti-list fs-6"></i>
+                                    </span>
+                                    <select asp-for="DocumentType" asp-items="ViewBag.DocumentTypes"
+                                        class="form-select select2" required>
+                                    </select>
+                                    <span asp-validation-for="DocumentType" class="invalid-feedback"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 mb-4">
+                                <label asp-for="IdentificationNumber" class="form-label"></label>
+                                <span class="text-danger">*</span>
+                                <div class="input-group">
+                                    <span class="input-group-text px-6">
+                                        <i class="ti ti-pencil fs-6"></i>
+                                    </span>
+                                    <input asp-for="IdentificationNumber" class="form-control ps-2" required readonly />
+                                    <span asp-validation-for="IdentificationNumber" class="invalid-feedback"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-12 mb-4">
+                                <label asp-for="Name" class="form-label"></label>
+                                <span class="text-danger">*</span>
+                                <div class="input-group">
+                                    <span class="input-group-text px-6">
+                                        <i class="ti ti-user fs-6"></i>
+                                    </span>
+                                    <input asp-for="Name" class="form-control ps-2" required
+                                        style="text-transform: uppercase"
+                                        oninput="this.value = this.value.toUpperCase()" readonly>
+                                    <span asp-validation-for="Name" class="invalid-feedback"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-12 mb-4">
+                                <label asp-for="LastName" class="form-label"></label>
+                                <span class="text-danger">*</span>
+                                <div class="input-group">
+                                    <span class="input-group-text px-6">
+                                        <i class="ti ti-user fs-6"></i>
+                                    </span>
+                                    <input asp-for="LastName" class="form-control ps-2" required
+                                        style="text-transform: uppercase"
+                                        oninput="this.value = this.value.toUpperCase()" readonly>
+                                    <span asp-validation-for="LastName" class="invalid-feedback"></span>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="d-flex align-items-center border-bottom pb-2 mb-4 mt-4">
+                            <i class="ti ti-list-details fs-5 me-2 text-success"></i>
+                            <h5 class="mb-0 fw-semibold text-body-secondary">Información Adicional</h5>
+                        </div>
+
+                        <div class="col-md-6 mb-4">
+                            <label asp-for="Username" class="form-label"></label>
+                            <div class="input-group">
+                                <span class="input-group-text px-6">
+                                    <i class="ti ti-user fs-6"></i>
+                                </span>
+                                <input asp-for="Username" class="form-control ps-2" required>
+                            </div>
+                            <span asp-validation-for="Username" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-6 mb-4">
+                            <label asp-for="SelectedRoleIds" class="form-label"></label>
+                            <div class="input-group select2-with-icon">
+                                <span class="input-group-text px-6">
+                                    <i class="ti ti-list fs-6"></i>
+                                </span>
+                                <select asp-for="SelectedRoleIds" asp-items="ViewBag.Roles" class="form-select select2"
+                                    multiple="multiple" required>
+                                </select>
+                                <span asp-validation-for="SelectedRoleIds" class="invalid-feedback"></span>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 mb-4">
+                            <label asp-for="PhoneNumber" class="form-label"></label>
+                            <div class="input-group">
+                                <span class="input-group-text px-6">
+                                    <i class="ti ti-phone fs-6"></i>
+                                </span>
+                                <input asp-for="PhoneNumber" class="form-control ps-2 international-inputmask">
+                                <span asp-validation-for="PhoneNumber" class="invalid-feedback"></span>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 mb-4">
+                            <label asp-for="Email" class="form-label"></label>
+                            <div class="input-group">
+                                <span class="input-group-text px-6">
+                                    <i class="ti ti-mail fs-6"></i>
+                                </span>
+                                <input asp-for="Email" class="form-control ps-2" placeholder="user@example.com"
+                                    oninput="this.value = this.value.toLowerCase()">
+                            </div>
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-6 mb-4">
+                            <label asp-for="BloodType" class="form-label"></label>
+                            <span class="text-danger">*</span>
+                            <div class="input-group select2-with-icon">
+                                <span class="input-group-text px-6">
+                                    <i class="ti ti-heart fs-6"></i>
+                                </span>
+                                <select asp-for="BloodType" asp-items="ViewBag.BloodTypes" class="form-select select2"
+                                    required>
+                                </select>
+                                <span asp-validation-for="BloodType" class="invalid-feedback"></span>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 mb-4">
+                            <label for="birthdatePicker" class="form-label">Fecha de Nacimiento</label>
+                            <span class="text-danger">*</span>
+                            <div class="input-group">
+                                <span class="input-group-text px-6">
+                                    <i class="ti ti-calendar fs-6"></i>
+                                </span>
+                                <input asp-for="BirthDateString" id="birthdatePicker" class="form-control ps-2"
+                                    required>
+                            </div>
+                            <span asp-validation-for="BirthDate" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-6 mb-4">
+                            <label asp-for="Nationality" class="form-label"></label>
+                            <span class="text-danger">*</span>
+                            <div class="input-group select2-with-icon">
+                                <span class="input-group-text px-6">
+                                    <i class="ti ti-world fs-6"></i>
+                                </span>
+                                <select asp-for="Nationality" asp-items="ViewBag.Nationalities"
+                                    class="form-select select2" required>
+                                    <option value="@ViewBag.NationalityLog.Code" selected>@ViewBag.NationalityLog.Name
+                                    </option>
+                                </select>
+                                <span asp-validation-for="Nationality" class="invalid-feedback"></span>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 mb-4">
+                            <label asp-for="Grade" class="form-label"></label>
+                            <div class="input-group select2-with-icon">
+                                <span class="input-group-text px-6">
+                                    <i class="ti ti-list fs-6"></i>
+                                </span>
+                                <select asp-for="Grade" asp-items="ViewBag.MilitaryGrades" class="form-select select2">
+                                </select>
+                                <span asp-validation-for="Grade" class="invalid-feedback"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Campo de programa para estudiantes-->
+                    <div id="courseField" class="row" style="display: none;">
+
+                        <div class="col-md-6 mb-4">
+                            <label asp-for="SeniorityOrder" class="form-label"></label>
+                            <span class="text-danger">*</span>
+                            <div class="input-group">
+                                <span class="input-group-text px-6">
+                                    <i class="ti ti-mail fs-6"></i>
+                                </span>
+                                <input asp-for="SeniorityOrder" class="form-control ps-2">
+                            </div>
+                            <span asp-validation-for="SeniorityOrder" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-6 mb-4">
+                            <label asp-for="Force" class="form-label"></label>
+                            <span class="text-danger">*</span>
+                            <div class="input-group select2-with-icon">
+                                <span class="input-group-text px-6">
+                                    <i class="ti ti-list fs-6"></i>
+                                </span>
+                                <select asp-for="Force" asp-items="ViewBag.Forces" class="form-select select2">
+                                    <option value="@ViewBag.ForceLog.Code" selected>@ViewBag.ForceLog.Name
+                                    </option>
+                                </select>
+                                <span asp-validation-for="Force" class="invalid-feedback"></span>
+                            </div>
+                        </div>
+
+                        <div class="col-md-12 mb-4">
+                            <label asp-for="CourseId" class="form-label"></label>
+                            <span class="text-danger">*</span>
+                            <div class="input-group select2-with-icon">
+                                <span class="input-group-text px-6">
+                                    <i class="ti ti-book fs-6"></i>
+                                </span>
+                                <select asp-for="CourseId" asp-items="ViewBag.ActiveCourses"
+                                    class="form-select select2">
+                                </select>
+                                <span asp-validation-for="CourseId" class="invalid-feedback"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Campos del perfil de aviación -->
+                    <div id="aviationFields" class="row" style="display: none;">
+
+                        <div class="col-md-6 mb-4">
+                            <label asp-for="PID" class="form-label"></label>
+                            <span class="text-danger">*</span>
+                            <div class="input-group">
+                                <span class="input-group-text px-6">
+                                    <i class="ti ti-id fs-6"></i>
+                                </span>
+                                <input asp-for="PID" id="PID" class="form-control ps-2"
+                                    style="text-transform: uppercase" oninput="this.value = this.value.toUpperCase()">
+                                <span asp-validation-for="PID" class="invalid-feedback"></span>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 mb-4">
+                            <label asp-for="FlightPosition" class="form-label"></label>
+                            <span class="text-danger">*</span>
+                            <div class="input-group select2-with-icon">
+                                <span class="input-group-text px-6">
+                                    <i class="ti ti-list fs-6"></i>
+                                </span>
+                                <select asp-for="FlightPosition" asp-items="ViewBag.FlightPositions"
+                                    class="form-select select2">
+                                    @if (ViewBag.FlightPositionLog != null)
+                                    {
+                                        <option value="@ViewBag.FlightPositionLog.Code" selected>
+                                            @ViewBag.FlightPositionLog.Name
+                                        </option>
+                                    }
+                                </select>
+                                <span asp-validation-for="FlightPosition" class="invalid-feedback"></span>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 mb-4">
+                            <label asp-for="WingType" class="form-label"></label>
+                            <span class="text-danger">*</span>
+                            <div class="input-group select2-with-icon">
+                                <span class="input-group-text px-6">
+                                    <i class="ti ti-propeller fs-6"></i>
+                                </span>
+                                <select asp-for="WingType" id="WingType" asp-items="ViewBag.WingTypes"
+                                    class="form-select select2">
+                                </select>
+                                <span asp-validation-for="WingType" class="invalid-feedback"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 mb-4">
+                        <div class="card bg-light">
+                            <div class="card-header">
+                                <h5 class="mb-0">
+                                    <i class="ti ti-lock-access me-2"></i>
+                                    Estado de la Cuenta
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row align-items-center">
+                                    <div class="col-md-6">
+                                        <div class="form-check form-switch py-2">
+                                            <input asp-for="WantToLock" class="form-check-input" type="checkbox"
+                                                id="lockoutSwitch" role="switch">
+                                            <label class="form-check-label" for="lockoutSwitch">
+                                                <span id="lockoutLabel">
+                                                    @(Model.IsLockedOut ? "Cuenta Bloqueada" : "Cuenta Activa")
+                                                </span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6" id="lockoutDateContainer"
+                                        style="display: @(Model.WantToLock ? "block" : "none");">
+                                        <label asp-for="LockoutEnd" class="form-label">
+                                            <i class="ti ti-calendar-event me-1"></i>
+                                            Bloqueado hasta
+                                        </label>
+                                        <div class="input-group">
+                                            <span class="input-group-text px-6">
+                                                <i class="ti ti-calendar-time fs-6"></i>
+                                            </span>
+                                            <input asp-for="LockoutEnd" id="lockoutDate" class="form-control ps-2"
+                                                placeholder="Seleccione fecha">
+                                        </div>
+                                        <span asp-validation-for="LockoutEnd" class="text-danger"></span>
+                                        <small class="text-muted">Deje vacío para bloqueo indefinido</small>
+                                    </div>
+                                </div>
+
+                                <div class="row mt-3" id="lockoutReasonContainer"
+                                    style="display: @(Model.WantToLock ? "block" : "none");">
+                                    <div class="col-12">
+                                        <label class="form-label" for="lockoutReasonTextarea">
+                                            <i class="ti ti-file-text me-1"></i>
+                                            Motivo del bloqueo
+                                        </label>
+                                        <div class="input-group">
+                                            <span class="input-group-text px-6">
+                                                <i class="ti ti-message-2 fs-6"></i>
+                                            </span>
+                                            <!--Evitar espacios y saltos de línea entre la etiqueta de apertura y la etiqueta de cierre del textarea-->
+                                            <textarea id="lockoutReasonTextarea" name="LockoutReason"
+                                                class="form-control" rows="3"
+                                                placeholder="Ingrese la razón del bloqueo..." @(Model.IsLockedOut ?
+                                                "readonly" : "")>@Model.LockoutReason</textarea>
+                                        </div>
+                                        <span asp-validation-for="LockoutReason" class="text-danger"></span>
+                                        @if (Model.IsLockedOut && !string.IsNullOrEmpty(Model.LockoutReason))
+                                        {
+                                            <small class="text-muted">Razón registrada anteriormente</small>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="button-group d-flex justify-content-center">
+                        <button type="submit" class="btn btn-primary w-75 py-8 mb-4 rounded-2">
+                            <i class="fas fa-save me-1"></i> Guardar Cambios
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+@section Styles {
+    <!-- Select2 CSS - Componente de Flexy para selects múltiples -->
+    <link rel="stylesheet" href="~/assets/libs/select2/dist/css/select2.min.css">
+
+    <!-- DatePicker CSS - Componente de Flexy para fechas -->
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-material-datetimepicker/2.7.1/css/bootstrap-material-datetimepicker.min.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+    <style>
+        /* Estilos para el switch de bloqueo */
+        .form-switch.switch-danger .form-check-input:checked {
+            background-color: #dc3545;
+            border-color: #dc3545;
+        }
+
+        .form-switch.switch-success .form-check-input:checked {
+            background-color: #28a745;
+            border-color: #28a745;
+        }
+
+        .form-switch.switch-danger .form-check-input:focus {
+            box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25);
+        }
+
+        .form-switch.switch-success .form-check-input:focus {
+            box-shadow: 0 0 0 0.25rem rgba(40, 167, 69, 0.25);
+        }
+    </style>
+}
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <!-- Bootstrap validation -->
+    <script src="~/assets/js/plugins/bootstrap-validation-init.js"></script>
+
+    <!-- Select2 JS - Componente para selects -->
+    <script src="~/assets/libs/select2/dist/js/select2.full.min.js"></script>
+    <script src="~/assets/libs/select2/dist/js/select2.min.js"></script>
+    <script src="~/assets/js/forms/select2.init.js"></script>
+
+    <!-- InputMask - Componente para máscaras de entrada -->
+    <script src="~/assets/libs/inputmask/dist/jquery.inputmask.min.js"></script>
+    <script src="~/assets/js/forms/mask.init.js"></script>
+
+    <!-- DatePicker - Componente para fechas -->
+    <script src="~/assets/js/extra-libs/moment/moment.min.js"></script>
+    <script
+        src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-material-datetimepicker/2.7.1/js/bootstrap-material-datetimepicker.min.js"></script>
+
+    <script type="module" src="~/js/Areas/Identity/User/user-edit.js"></script>
+
+    <script type="module">
+        import { initializeImageValidation } from '/js/Areas/Identity/User/image-validation.js';
+
+        // Inicializar validación de imagen
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeImageValidation('photoInput', 'photoPreview');
+        });
+    </script>
+}

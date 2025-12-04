@@ -1,0 +1,327 @@
+@model EvaluationOverviewDto
+@{
+    string gradeA = GradeConstants.GradeTypes.A;
+    string gradeB = GradeConstants.GradeTypes.B;
+    string gradeC = GradeConstants.GradeTypes.C;
+    string gradeN = GradeConstants.GradeTypes.N;
+    string gradeDM = GradeConstants.GradeTypes.DM;
+    string gradeSC = GradeConstants.GradeTypes.SC;
+    string gradeNR = GradeConstants.GradeTypes.NR;
+    string NR_DESCRIPTION = GradeConstants.GradeDescriptions.NR_DESCRIPTION;
+    string mentalFactor = GradeConstants.NRedCategories.Mental;
+    string physicalFactor = GradeConstants.NRedCategories.Physical;
+    string emotionalFactor = GradeConstants.NRedCategories.Emotional;
+}
+
+<form asp-action="SaveEvaluation" method="post" id="evaluationForm" class="needs-validation" novalidate>
+    <input type="hidden" name="StudentId" value="@Model.StudentId" />
+    <input type="hidden" name="InstructorId" value="@Model.InstructorId" />
+    <input type="hidden" name="MissionId" value="@Model.NextMissionToEvaluate!.MissionId" />
+    <input type="hidden" name="PhaseId" value="@Model.NextMissionToEvaluate.PhaseId" />
+    <input type="hidden" name="CourseId" value="@Model.CourseId" />
+
+    <!-- Misión Evaluable y Fecha de Evaluación General -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label class="form-label">
+                    <i class="ti ti-checkbox me-1"></i>Misión Evaluable
+                </label>
+                <div class="form-check form-switch" style="background: none;">
+                    <input class="form-check-input" type="checkbox" role="switch" id="isMissionEvaluable" checked>
+                    <label class="form-check-label" for="IsMissionEvaluable" id="missionEvaluableLabel">
+                        SI
+                    </label>
+                </div>
+                <small class="text-muted">Indica si esta misión será evaluada</small>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="EvaluationDate" class="form-label">
+                    <i class="ti ti-calendar me-1"></i>Fecha de Evaluación
+                </label>
+                <input type="text" class="form-control" name="EvaluationDate" id="EvaluationDate"
+                    placeholder="Ingrese Fecha" required />
+                <div class="invalid-feedback">Debe seleccionar una fecha</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Matrícula de la Aeronave y Horas de Vuelo Máquina -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="AircraftId" class="form-label">
+                    <i class="ti ti-plane me-1"></i>Matrícula de la Aeronave
+                </label>
+                <select name="AircraftId" id="AircraftId" asp-items="@ViewBag.SelectAircraft" class="form-select"
+                    required>
+                    <option value="">Seleccione una Aeronave</option>
+                </select>
+                <div class="invalid-feedback">Debe seleccionar una aeronave</div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+
+                <label for="MachineFlightHours" class="form-label">
+                    <i class="ti ti-clock me-1"></i>Horas de Vuelo Máquina
+                </label>
+
+                <input type="number" class="form-control" name="MachineFlightHours" id="MachineFlightHours" step="0.1"
+                    min="0.1" max="10.0" required
+                    value="@(Model.NextMissionToEvaluate != null ? Math.Round(Model.NextMissionToEvaluate.FlightHours / 1.3, 1).ToString("0.0", System.Globalization.CultureInfo.InvariantCulture) : "")">
+                <div class="invalid-feedback">Las horas deben estar entre 0.1 y 10.0</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tareas Regulares -->
+    @if (Model.NextMissionToEvaluate?.MissionTasks?.Any() == true)
+    {
+        <div class="mb-4">
+            <h6 class="mb-3">
+                <i class="ti ti-list-check me-2"></i>
+                Tareas de la Misión (@Model.NextMissionToEvaluate.MissionTasks.Count())
+            </h6>
+
+            @{
+                var taskIndex = 0;
+            }
+            @foreach (var task in Model.NextMissionToEvaluate.MissionTasks
+                    .OrderBy(t => t.DisplayOrder)
+                    .ThenByDescending(t => t.IsP3InThisMission)
+                    .ThenBy(t => t.TaskName))
+            {
+                <div class="task-evaluation-card task-regular p-3 mb-3">
+                    <div class="row align-items-start">
+                        <div class="col-md-5">
+                            <h6 class="mb-1">
+                                @if (task.IsP3InThisMission)
+                                {
+                                    <span class="badge bg-danger ms-2">P3</span>
+                                }
+                            </h6>
+                            <p class="mb-1 small text-muted">@task.TaskName</p>
+                        </div>
+                        <div class="col-md-7">
+                            <input type="hidden" name="TaskGrades[@taskIndex].TaskId" value="@task.TaskId" />
+
+                            <div class="grade-buttons btn-group w-100" role="group">
+                                <input type="radio" class="btn-check regular-task-grade" name="TaskGrades[@taskIndex].Grade"
+                                    id="task_@(task.MissionTaskId)_A" value="@gradeA" required />
+                                <label class="btn btn-outline-success" for="task_@(task.MissionTaskId)_A">@gradeA</label>
+
+                                <input type="radio" class="btn-check regular-task-grade" name="TaskGrades[@taskIndex].Grade"
+                                    id="task_@(task.MissionTaskId)_B" value="@gradeB" />
+                                <label class="btn btn-outline-success" for="task_@(task.MissionTaskId)_B">@gradeB</label>
+
+                                <input type="radio" class="btn-check regular-task-grade" name="TaskGrades[@taskIndex].Grade"
+                                    id="task_@(task.MissionTaskId)_C" value="@gradeC" />
+                                <label class="btn btn-outline-success" for="task_@(task.MissionTaskId)_C">@gradeC</label>
+
+                                @if (!task.IsP3InThisMission)
+                                {
+                                    <input type="radio" class="btn-check regular-task-grade" name="TaskGrades[@taskIndex].Grade"
+                                        id="task_@(task.MissionTaskId)_N" value="@gradeN" />
+                                    <label class="btn btn-outline-success" for="task_@(task.MissionTaskId)_N">@gradeN</label>
+                                }
+
+                                <input type="radio" class="btn-check regular-task-grade" name="TaskGrades[@taskIndex].Grade"
+                                    id="task_@(task.MissionTaskId)_DM" value="@gradeDM" />
+                                <label class="btn btn-outline-info" for="task_@(task.MissionTaskId)_DM">@gradeDM</label>
+
+                                <input type="radio" class="btn-check regular-task-grade" name="TaskGrades[@taskIndex].Grade"
+                                    id="task_@(task.MissionTaskId)_SC" value="@gradeSC" />
+                                <label class="btn btn-outline-info" for="task_@(task.MissionTaskId)_SC">/</label>
+
+                                @if (task.IsP3InThisMission)
+                                {
+                                    <input type="radio" class="btn-check regular-task-grade" name="TaskGrades[@taskIndex].Grade"
+                                        id="task_@(task.MissionTaskId)_NR" value="@gradeNR" />
+                                    <label class="btn btn-outline-danger"
+                                        for="task_@(task.MissionTaskId)_NR">@NR_DESCRIPTION</label>
+                                }
+                            </div>
+                        </div>
+
+                        <div>
+                            <!-- Contenedor para categorias y razones de la nota N o N-Roja de cada tarea(se llenará via JavaScript) -->
+                            <div class="nred-fields-container" id="nred_container_@(task.MissionTaskId)"
+                                data-task-index="@taskIndex" data-task-id="@task.TaskId" data-task-name="@task.TaskName"
+                                data-is-p3="@task.IsP3InThisMission.ToString().ToLower()">
+                                <!-- Los campos hidden se generarán dinámicamente aquí cuando se seleccionen razones -->
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                taskIndex++;
+            }
+        </div>
+    }
+
+    <!-- Observaciones Generales -->
+    <div class="mb-4">
+        <div class="form-group">
+            <label for="GeneralObservations" class="form-label">
+                <i class="ti ti-message-2 me-1"></i>Observaciones Generales de la Misión
+            </label>
+            <textarea class="form-control" name="GeneralObservations" id="GeneralObservations" rows="4" maxlength="2000"
+                required
+                placeholder="Observaciones generales sobre el desempeño del estudiante en esta misión..."></textarea>
+            <div class="invalid-feedback">Las observaciones son requeridas y no pueden tener menos de 20 caracteres o
+                superar los 2000 caracteres</div>
+            <div class="d-flex justify-content-between align-items-center mt-1">
+                <small class="text-muted">
+                    <span id="charCount">0</span> / 2000 caracteres
+                    <span id="charRemaining" class="ms-2">(2000 restantes)</span>
+                </small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Botones de Acción -->
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between">
+                <a href="@Url.Action("Details", "Course", new { area = "Academic", id = Model.CourseId })"
+                    class="btn btn-outline-secondary">
+                    <i class="ti ti-arrow-left me-1"></i>
+                    Volver al Programa
+                </a>
+
+                <button type="submit" class="btn btn-success">
+                    <i class="ti ti-device-floppy me-1"></i>
+                    Guardar Evaluación
+                </button>
+            </div>
+        </div>
+    </div>
+</form>
+
+<!-- Modal de Selección de Razones N-Roja -->
+<div class="modal fade" id="modalNRedReasons" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title">
+                    <i class="ti ti-alert-triangle me-2"></i>
+                    Seleccionar Razones para Calificación No Satisfactoria
+                </h5>
+            </div>
+            <div class="modal-body">
+                <!-- Información de la tarea -->
+                <div class="alert alert-light border mb-3">
+                    <h6 class="mb-2">
+                        <strong>Tarea:</strong>
+                        <span id="modalTaskName"></span>
+                    </h6>
+                </div>
+
+                <!-- Selección de categorías y razones -->
+                <div class="mb-3">
+                    <p class="text-muted mb-3">
+                        <i class="ti ti-info-circle me-1"></i>
+                        Seleccione una o varias categorías y al menos una razón por cada categoría seleccionada.
+                    </p>
+
+                    <!-- Acordeón para las categorías -->
+                    <div class="accordion" id="accordionNRedCategories">
+                        <!-- Categoría Mental -->
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                    data-bs-target="#collapseMental">
+                                    <i class="ti ti-brain me-2"></i>
+                                    Factor Mental
+                                </button>
+                            </h2>
+                            <div id="collapseMental" class="accordion-collapse collapse"
+                                data-bs-parent="#accordionNRedCategories">
+                                <div class="accordion-body">
+                                    <div class="reasons-container" data-category="@mentalFactor">
+                                        <div class="d-flex justify-content-center">
+                                            <div class="spinner-border spinner-border-sm text-primary" role="status">
+                                                <span class="visually-hidden">Cargando...</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Categoría Física -->
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                    data-bs-target="#collapsePhysical">
+                                    <i class="ti ti-run me-2"></i>
+                                    Factor Físico
+                                </button>
+                            </h2>
+                            <div id="collapsePhysical" class="accordion-collapse collapse"
+                                data-bs-parent="#accordionNRedCategories">
+                                <div class="accordion-body">
+                                    <div class="reasons-container" data-category="@physicalFactor">
+                                        <div class="d-flex justify-content-center">
+                                            <div class="spinner-border spinner-border-sm text-primary" role="status">
+                                                <span class="visually-hidden">Cargando...</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Categoría Emocional -->
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                    data-bs-target="#collapseEmotional">
+                                    <i class="ti ti-heart me-2"></i>
+                                    Factor Emocional
+                                </button>
+                            </h2>
+                            <div id="collapseEmotional" class="accordion-collapse collapse"
+                                data-bs-parent="#accordionNRedCategories">
+                                <div class="accordion-body">
+                                    <div class="reasons-container" data-category="@emotionalFactor">
+                                        <div class="d-flex justify-content-center">
+                                            <div class="spinner-border spinner-border-sm text-primary" role="status">
+                                                <span class="visually-hidden">Cargando...</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mensaje de validación -->
+                <div class="alert alert-danger d-none" id="modalValidationMessage">
+                    <i class="ti ti-alert-circle me-1"></i>
+                    <span id="modalValidationText"></span>
+                </div>
+
+                <!-- Campos ocultos para tracking -->
+                <input type="hidden" id="modalTaskIndex" value="">
+                <input type="hidden" id="modalTaskId" value="">
+            </div>
+            <!-- Botones -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="btnCancelNRed">
+                    <i class="ti ti-x me-1"></i>
+                    Cancelar y Limpiar Calificación
+                </button>
+                <button type="button" class="btn btn-primary" id="btnSaveNRed">
+                    <i class="ti ti-check me-1"></i>
+                    Guardar Razones
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

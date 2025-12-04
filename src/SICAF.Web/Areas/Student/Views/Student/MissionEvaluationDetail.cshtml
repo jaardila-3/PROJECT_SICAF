@@ -1,0 +1,327 @@
+@model MissionEvaluationDetailDto
+@{
+    ViewData["Title"] = $"Detalle Evaluación - Misión {Model.MissionNumber}";
+    string gradeDM = GradeConstants.GradeTypes.DM;
+    string gradeSC = GradeConstants.GradeTypes.SC;
+    string gradeNR = GradeConstants.GradeTypes.NR;
+    string viewType = ViewBag.ViewType;
+    var returnUrl = ViewBag.ReturnUrl as string;
+}
+
+<nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb rounded">
+        <li class="breadcrumb-item">
+            <a href="@Url.Action("Index", "Home", new { area = "" })" class="text-success d-flex align-items-center">
+                <i class="ti ti-home fs-4 mt-1"></i>
+            </a>
+        </li>
+        @if (returnUrl == "report")
+        {
+            <li class="breadcrumb-item">
+                <a href="@Url.Action("Index", "Report", new { area = "Reports" })" class="text-success">Informes</a>
+            </li>
+            <li class="breadcrumb-item">
+                <a href="javascript:window.close();" class="text-success">Informe Académico Detallado</a>
+            </li>
+        }
+        else if (returnUrl == "instructor")
+        {
+            <li class="breadcrumb-item">
+                <a href="@Url.Action("Index", "Course", new { area = "Academic" })" class="text-success">Programas</a>
+            </li>
+            <li class="breadcrumb-item">
+                <a href="@Url.Action("Details", "Course", new { area = "Academic", id = Model.CourseId })"
+                    class="text-success">Detalles</a>
+            </li>
+            <li class="breadcrumb-item">
+                <a href="@Url.Action("EvaluateStudent", "Evaluation", new { area = "Instructor", studentId = Model.StudentId, courseId = Model.CourseId })"
+                    class="text-success">Evaluar</a>
+            </li>
+            <li class="breadcrumb-item text-success active" aria-current="page">@Model.MissionName</li>
+        }
+        else
+        {
+            <li class="breadcrumb-item">
+                <a href="@Url.Action("Index", "Course")" class="text-success">Programas</a>
+            </li>
+            <li class="breadcrumb-item">
+                <a href="@Url.Action("Details", "Course", new { area = "Academic", id = Model.CourseId })"
+                    class="text-success">Detalles</a>
+            </li>
+            <li class="breadcrumb-item text-success active" aria-current="page">@Model.PhaseName - @Model.MissionName</li>
+        }
+    </ol>
+</nav>
+
+<div class="container-fluid">
+    <!-- Header con información del estudiante -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-2 text-center mb-2">
+                            @if (Model.PhotoBase64 != null)
+                            {
+                                <img src="@Model.PhotoBase64" alt="@Model.StudentFullName" class="img-fluid rounded"
+                                    style="width: 100%; max-width: 100px; height: auto; aspect-ratio: 1/1; object-fit: cover;">
+                            }
+                            else
+                            {
+                                <div class="rounded-circle bg-success d-flex align-items-center justify-content-center mx-auto"
+                                    style="width: 100px; height: 100px;">
+                                    <span class="text-white fw-bold fs-3">
+                                        @Model.StudentFullName.Substring(0, 1)
+                                    </span>
+                                </div>
+                            }
+                        </div>
+                        <div class="col-md-6">
+                            <h4 class="mb-2">@Model.StudentFullName</h4>
+                            <p class="mb-1"><strong>Identificación:</strong> @Model.StudentIdentification</p>
+                            <p class="mb-1"><strong>Programa:</strong> @Model.CourseName</p>
+                        </div>
+                        @if (viewType != AviationConstants.NonEvaluableMission)
+                        {
+                            <div class="col-md-4 text-end">
+                                <div class="mb-2">
+                                    @if (Model.MissionPassed)
+                                    {
+                                        <span class="badge bg-success fs-5">
+                                            <i class="ti ti-check-circle me-1"></i>
+                                            Misión Satisfactoria
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-danger fs-5">
+                                            <i class="ti ti-alert-triangle me-1"></i>
+                                            Misión Insatisfactoria
+                                        </span>
+                                    }
+                                </div>
+                                @if (Model.CriticalFailures > 0)
+                                {
+                                    <div>
+                                        <span class="badge bg-danger fs-6">
+                                            @Model.CriticalFailures N-Roja(s)
+                                        </span>
+                                    </div>
+                                }
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Información de la misión y evaluación -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="ti ti-clipboard-check me-2"></i>
+                        Información de la Misión
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-borderless mb-0">
+                        <tbody>
+                            <tr>
+                                <td class="fw-bold">Fase Número:</td>
+                                <td>
+                                    @Model.PhaseNumber
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="fw-bold">Nombre de la Fase:</td>
+                                <td>
+                                    @Model.PhaseName
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="fw-bold" style="width: 40%;">Misión/Periodo:</td>
+                                <td>@Model.MissionNumber</td>
+                            </tr>
+                            <tr>
+                                <td class="fw-bold">Tipo de Ala:</td>
+                                <td>
+                                    <span class="badge bg-info">@Model.WingType</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="fw-bold">Aeronave:</td>
+                                <td>
+                                    @Model.AircraftRegistration
+                                    <small class="text-muted">(@Model.AircraftType)</small>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="ti ti-user-check me-2"></i>
+                        Información de la Evaluación
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-borderless mb-0">
+                        <tbody>
+                            <tr>
+                                <td class="fw-bold" style="width: 40%;">Fecha:</td>
+                                <td>@Model.EvaluationDate.ToString("dd/MM/yyyy")</td>
+                            </tr>
+                            <tr>
+                                <td class="fw-bold">Instructor:</td>
+                                <td>
+                                    @Model.InstructorFullName
+                                    <br>
+                                    <small class="text-muted">@Model.InstructorIdentification</small>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="fw-bold">Horas Máquina:</td>
+                                <td>@Model.MachineFlightHours.ToString("F2") hrs</td>
+                            </tr>
+                            <tr>
+                                <td class="fw-bold">Horas Hombre:</td>
+                                <td>@Model.ManFlightHours.ToString("F2") hrs</td>
+                            </tr>
+                            <tr>
+                                <td class="fw-bold">Horas Sílabo:</td>
+                                <td>@Model.SilaboFlightHours.ToString("F2") hrs</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Calificaciones de Tareas -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="ti ti-list-check me-2"></i>
+                        Calificaciones de Tareas (@Model.TaskGrades.Count())
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th style="width: 40%;">Tarea</th>
+                                    <th style="width: 10%;" class="text-center">Calificación</th>
+                                    <th style="width: 40%;">Observaciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var taskGrade in Model.TaskGrades.OrderByDescending(t => t.Grade))
+                                {
+                                    <tr>
+                                        <td>@taskGrade.TaskName</td>
+                                        <td class="text-center">
+                                            @if (taskGrade.Grade == gradeNR)
+                                            {
+                                                <span class="badge bg-danger fs-4">N ROJA</span>
+                                            }
+                                            else if (taskGrade.Grade == gradeDM)
+                                            {
+                                                <span class="badge bg-info fs-6">@taskGrade.Grade</span>
+                                            }
+                                            else if (taskGrade.Grade == gradeSC)
+                                            {
+                                                <span class="badge bg-info fs-6">/</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-success fs-6">@taskGrade.Grade</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            @if (taskGrade.NRedReasons.Any())
+                                            {
+                                                <div class="text-danger">
+                                                    @foreach (var categoryGroup in taskGrade.NRedReasons.GroupBy(nr =>
+                                                                                                nr.ReasonCategory))
+                                                    {
+                                                        <div class="mb-3">
+                                                            <strong>Categoría:</strong> @categoryGroup.Key
+                                                            <ul class="mb-0 mt-1">
+                                                                @foreach (var reason in categoryGroup)
+                                                                {
+                                                                    <li>@reason.ReasonDescription</li>
+                                                                }
+                                                            </ul>
+                                                        </div>
+                                                    }
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">-</span>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Observaciones Generales -->
+    @if (!string.IsNullOrEmpty(Model.GeneralObservations))
+    {
+        <div class="row mb-2">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="ti ti-message-2 me-2"></i>
+                            Observaciones Generales
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="mb-0">@Model.GeneralObservations</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Botones de acción -->
+    @if (returnUrl == "instructor")
+    {
+        <div class="row mb-2">
+            <div class="col-12 text-center">
+                <a href="@Url.Action("EvaluateStudent", "Evaluation", new { area = "Instructor", studentId = Model.StudentId, courseId = Model.CourseId })"
+                    class="btn btn-outline-secondary">
+                    <i class="ti ti-arrow-left me-1"></i>
+                    Volver a la Evaluación
+                </a>
+            </div>
+        </div>
+    }
+    else if (returnUrl == "report")
+    {
+        <div class="mb-2">
+            <button onclick="window.close();" class="btn btn-secondary">
+                <i class="ti ti-x me-1"></i>Cerrar
+            </button>
+        </div>
+    }
+</div>

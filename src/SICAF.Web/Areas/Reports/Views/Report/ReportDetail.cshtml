@@ -1,0 +1,150 @@
+@model ReportDetailDto
+
+@{
+    ViewData["Title"] = "Informe Académico Detallado";
+    var reportType = ViewBag.ReportType as string;
+}
+
+<nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb rounded">
+        <li class="breadcrumb-item">
+            <a href="@Url.Action("Index", "Home", new { area = "" })" class="text-success d-flex align-items-center">
+                <i class="ti ti-home fs-4 mt-1"></i>
+            </a>
+        </li>
+        <li class="breadcrumb-item">
+            <a href="@Url.Action("Index", "Report", new { area = "Reports" })" class="text-success">Informes</a>
+        </li>
+        <li class="breadcrumb-item">
+            <a href="javascript:window.close();" class="text-success">Informe General</a>
+        </li>
+        <li class="breadcrumb-item text-success active" aria-current="page">Detalle</li>
+    </ol>
+</nav>
+
+<div class="container-fluid bg-white p-4">
+
+    <!-- Header -->
+    <div class="mb-4">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h4 class="page-title text-truncate font-weight-medium mb-1">
+                            <i class="ti ti-file-analytics me-2"></i>@Model.Title
+                        </h4>
+                        <p class="text-muted mb-0">@Model.Subtitle</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filtros aplicados -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h6 class="card-title mb-0 text-white">
+                        <i class="ti ti-filter me-2"></i>Filtros Aplicados
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 mb-2">
+                            <label class="form-label fw-semibold text-muted">Programa:</label>
+                            <p class="mb-0">@Model.CourseName</p>
+                        </div>
+                        @if (!string.IsNullOrEmpty(Model.Force))
+                        {
+                            <div class="col-md-2 mb-2">
+                                <label class="form-label fw-semibold text-muted">Fuerza:</label>
+                                <p class="mb-0">@Model.Force</p>
+                            </div>
+                        }
+                        @if (!string.IsNullOrEmpty(Model.WingType))
+                        {
+                            <div class="col-md-2 mb-2">
+                                <label class="form-label fw-semibold text-muted">Tipo de Ala:</label>
+                                <p class="mb-0"><span class="badge bg-success">@Model.WingType</span></p>
+                            </div>
+                        }
+                        @if (!string.IsNullOrEmpty(Model.PhaseName))
+                        {
+                            <div class="col-md-3 mb-2">
+                                <label class="form-label fw-semibold text-muted">Fase:</label>
+                                <p class="mb-0"><span class="badge bg-info">@Model.PhaseName</span></p>
+                            </div>
+                        }
+                        <div class="col-md-2 mb-2">
+                            <label class="form-label fw-semibold text-muted">Valor Seleccionado:</label>
+                            <p class="mb-0"><span class="badge bg-primary">@Model.SelectedValue</span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabla de datos (renderiza partial según tipo) -->
+    <div class="row mb-4">
+        <div class="col-12">
+            @switch (reportType)
+            {
+                case ReportDetailConstants.Grades:
+                    @await Html.PartialAsync("Partials/_GradeDistributionDetail", Model)
+                    break;
+
+                case ReportDetailConstants.MachineHours:
+                    @await Html.PartialAsync("Partials/_MachineFlightHoursDetail", Model)
+                    break;
+
+                case ReportDetailConstants.InstructorHours:
+                    @await Html.PartialAsync("Partials/_InstructorFlightHoursDetail", Model)
+                    break;
+
+                case ReportDetailConstants.MachineUnsatisfactory:
+                    @await Html.PartialAsync("Partials/_MachineUnsatisfactoryDetail", Model)
+                    break;
+
+                case ReportDetailConstants.InstructorUnsatisfactory:
+                    @await Html.PartialAsync("Partials/_InstructorUnsatisfactoryDetail", Model)
+                    break;
+
+                case ReportDetailConstants.NRedCategories:
+                    @await Html.PartialAsync("Partials/_NRedCategoriesDetail", Model)
+                    break;
+
+                default:
+                    <div class="alert alert-danger">Tipo de reporte no reconocido</div>
+                    break;
+            }
+        </div>
+    </div>
+
+    <!-- Botones de acción -->
+    <div class="mb-2">
+        <button onclick="window.close();" class="btn btn-secondary">
+            <i class="ti ti-x me-1"></i>Cerrar
+        </button>
+    </div>
+
+</div>
+
+@section Styles {
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="~/assets/libs/datatables.net-bs5/css/dataTables.bootstrap5.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.dataTables.min.css">
+}
+
+@section Scripts {
+    <!-- DataTables JS -->
+    <script src="~/assets/libs/datatables.net/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.print.min.js"></script>
+    <script src="~/assets/js/datatable/datatable-advanced.init.js"></script>
+}

@@ -1,0 +1,158 @@
+@using static SICAF.Common.Constants.UserConstants
+@model SICAF.Common.DTOs.Reports.IndividualReportDto
+
+@if (Model.PhaseHistory.Any())
+{
+    <div class="row mt-3">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-primary">
+                    <h5 class="mb-0 text-white">
+                        <i class="ti ti-clipboard-list me-2"></i>
+                        Mis Misiones por Fase
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="accordion" id="accordionPhaseHistory">
+                        @foreach (var phase in Model.PhaseHistory.OrderBy(p => p.PhaseNumber))
+                        {
+                            var accordionId = $"phase{phase.PhaseId}";
+                            var headingId = $"heading{phase.PhaseId}";
+                            var collapseId = $"collapse{phase.PhaseId}";
+
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="@headingId">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#@collapseId" aria-expanded="false" aria-controls="@collapseId">
+                                        <div class="d-flex justify-content-between align-items-center w-100 me-3">
+                                            <div>
+                                                <i class="ti ti-book me-2 text-primary"></i>
+                                                <strong>@phase.PhaseName</strong>
+                                            </div>
+                                            <div class="d-flex align-items-center gap-3">
+                                                <small class="text-muted">
+                                                    <i class="ti ti-check-circle me-1"></i>
+                                                    @phase.CompletedMissionsCount / @phase.TotalMissionsInPhase misiones
+                                                </small>
+                                                @if (!string.IsNullOrEmpty(phase.PhaseStatus))
+                                                {
+                                                    <span class="badge @StudentStatus.GetStatusBadgeClass(phase.PhaseStatus)">
+                                                        @phase.PhaseStatus
+                                                    </span>
+                                                }
+                                            </div>
+                                        </div>
+                                    </button>
+                                </h2>
+                                <div id="@collapseId" class="accordion-collapse collapse" aria-labelledby="@headingId"
+                                    data-bs-parent="#accordionPhaseHistory">
+                                    <div class="accordion-body">
+                                        <!-- Misiones Evaluables -->
+                                        @if (phase.CompletedMissions.Any())
+                                        {
+                                            <h6 class="mb-3">
+                                                <i class="ti ti-checkbox me-1"></i>
+                                                Misiones Evaluables (@phase.CompletedMissions.Count)
+                                            </h6>
+                                            <div class="row">
+                                                @foreach (var mission in phase.CompletedMissions.OrderBy(m => m.MissionNumber))
+                                                {
+                                                    <div class="col-md-4 col-sm-6 mb-3">
+                                                        <div class="mission-card completed p-3 hover-shadow position-relative">
+                                                            <a asp-action="MissionEvaluationDetail" asp-controller="Student"
+                                                                asp-area="Student" asp-route-missionId="@mission.MissionId"
+                                                                asp-route-studentId="@Model.StudentId"
+                                                                asp-route-courseId="@Model.CourseId" class="text-decoration-none">
+                                                                <div class="d-flex justify-content-between align-items-start">
+                                                                    <div>
+                                                                        <h6 class="mb-1">@mission.MissionName</h6>
+                                                                        <p class="mb-1 small text-muted">Instructor:</p>
+                                                                        <p class="mb-1 small text-muted">
+                                                                            @mission.GradeNameInstructor
+                                                                        </p>
+                                                                        <p class="mb-1 small text-muted">
+                                                                            @mission.CompletionDate.ToString("dd/MM/yyyy")
+                                                                        </p>
+                                                                    </div>
+                                                                    <div class="text-end">
+                                                                        @if (mission.MissionPassed)
+                                                                        {
+                                                                            <span class="badge bg-success">Satisfactoria</span>
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <span class="badge bg-danger">Insatisfactoria</span>
+                                                                            @if (mission.CriticalFailures > 0)
+                                                                            {
+                                                                                <br>
+                                                                                <span class="badge bg-danger mt-1">
+                                                                                    @mission.CriticalFailures N-Rojas
+                                                                                </span>
+                                                                            }
+                                                                        }
+                                                                    </div>
+                                                                </div>
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                }
+                                            </div>
+                                        }
+
+                                        <!-- Misiones No Evaluables -->
+                                        @if (phase.NonEvaluableMissions.Any())
+                                        {
+                                            @if (phase.CompletedMissions.Any())
+                                            {
+                                                <hr class="my-4">
+                                            }
+                                            <h6 class="mb-3">
+                                                <i class="ti ti-clipboard me-1"></i>
+                                                Misiones No Evaluables (@phase.NonEvaluableMissions.Count)
+                                            </h6>
+                                            <div class="row">
+                                                @foreach (var mission in phase.NonEvaluableMissions.OrderBy(m => m.MissionNumber))
+                                                {
+                                                    <div class="col-md-4 col-sm-6 mb-3">
+                                                        <div class="mission-card completed p-3 hover-shadow position-relative">
+                                                            <a asp-action="MissionEvaluationDetail" asp-controller="Student"
+                                                                asp-area="Student" asp-route-missionId="@mission.MissionId"
+                                                                asp-route-studentId="@Model.StudentId"
+                                                                asp-route-courseId="@Model.CourseId"
+                                                                asp-route-viewType="@AviationConstants.NonEvaluableMission"
+                                                                class="text-decoration-none">
+                                                                <div class="d-flex justify-content-between align-items-start">
+                                                                    <div>
+                                                                        <h6 class="mb-1">Misión No Evaluable @mission.MissionNumber</h6>
+                                                                        <p class="mb-1 small text-muted">@mission.DisplayName</p>
+                                                                        <p class="mb-0 small">
+                                                                            <i class="ti ti-clock-hour-3 me-1"></i>
+                                                                            @mission.ManFlightHours.ToString("F1") hrs
+                                                                        </p>
+                                                                    </div>
+                                                                </div>
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                }
+                                            </div>
+                                        }
+
+                                        <!-- Mensaje si no hay misiones -->
+                                        @if (!phase.CompletedMissions.Any() && !phase.NonEvaluableMissions.Any())
+                                        {
+                                            <div class="alert alert-info" role="alert">
+                                                <i class="ti ti-info-circle me-2"></i>
+                                                No hay misiones completadas en esta fase aún.
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
